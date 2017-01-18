@@ -1,0 +1,20 @@
+*AGC_stats : compute some statistics on the last AGC file found in the ~/Jammer/data folder and write it in a file
+
+*background_loop : is a loop executed every 5min that check if new files are available in the data.
+  If so it generates a report on the event and a plot of the AGC data of the day. The figures are put in ~/Jammer/data/figures
+
+*calibration.mat : is a matlab matrix that contain the AGC value as a function of the power of the white noise injected in the module.
+ It was generated experimentally.
+
+*datetick_custom : is like datetick function in matlab but use Unix timestamp instead of datenum and plot both UTC time and local time.
+
+*getAgcfromFolder : is a function get the AGC values of a period of time going in the folder of data and reading in all the AGC files
+ to find the data
+
+*init : is executed by background_loop at first. It contains the parameters of the station (folders, threshold, logname, IP and timezone)
+
+*spectro_cplx : generate spectrogram directly from packed complex IF data
+
+*start_matlab : is a shell script that start matlab and execute background_loop in a background task
+
+*unpack_cplx : unpack the IF complex data.

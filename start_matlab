@@ -1,0 +1,1 @@
+nice -n 15 nohup matlab -logfile ~/Mscriptlog.txt -nodisplay -nodesktop -nosplash -r 'background_loop' > ~/Mscriptlog2.txt &
