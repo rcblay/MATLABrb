@@ -7,7 +7,7 @@ close all
 clc
 
 %% Sets parameters
-folder = '/home/dma/Documents/CUvsSUcompare/data/CU_SiGe_1'; %'/home/minty/Desktop/Ksenia/Data';
+folder = '/home/dma/Documents/CUvsSUcompare/data/CU_SiGe_1';
 out_folder = [folder,'/figures'];
 activate_matlab_fig = 0;
 activate_IF_generation = 1;
@@ -17,7 +17,11 @@ sampling_freq =  8.183800e6;
 threshold = 0.95;
 logname = 'CU'; %'rec'
 
-%Time zone
+%% Trigger Settings
+thresh = 0.9; % Voltage threshold
+pts_under_thrsh = 5; % # of pts under threshold that constitutes a trigger
+
+%% Time zone
 use_local_timezone = 1; %1-AUTO 0-MANUAL
 %if 0 indicate an other timezone ID, examples : 
 % for Boulder,CO : 'US/Mountain'

@@ -1,5 +1,5 @@
 function [plot_fid, plotted_time, plotted_agc] = AGC_Plotting(start_time...
-    , end_time, directory, file_name, x_tick_location,logname)
+    ,end_time,directory,file_name,x_tick_location,thresh,pts_under_thrsh)
 % input:
 %   start_time:       start time for plotting (unix timestamp)
 %   end_time:         end time for plotting (unix timestamp)
@@ -70,36 +70,27 @@ for ii = 1:length(fileNames) % Most certainly only length=1
     % Find times that are in the time range
     time_index = find(time >= start_time & time <= end_time);
     time = time(time_index); % Sets time to only the time in time range
-    
-    time = interpTime(time);
-    
-    % HERE: UPDATE AGC TO MAKE EVENTS RED
-    % Thoughts: Loop through all agc values, do an if statement that says
-    % if a point is below threshold plus the next four are also below, then
-    % save that point and its corresponding time to a new array
-    if logname == 'CU'
-        thresh = 0.9;
-    elseif logname == 'SU'
-        thresh = 0.9;
-    end
-    agc = agc(time_index); % Sets agc to corresponding agc in time range
-    k = 1;
-    for i = 1:length(agc)-5
-        if agc(i:i+4) < thresh
-            EventAgc(k) = agc(i);
-            EventTime(k) = time(i);
-            k = k + 1;
+
+    if (~isempty(time)) % If not empty (expected), but could be empty
+        time = interpTime(time);
+        % Creates array of trigger points that will be made red in future
+        agc = agc(time_index); % Set agc to corresponding agc in time range
+        k = 1;
+        for i = 1:length(agc)-pts_under_thrsh
+            if agc(i:i+pts_under_thrsh-1) < thresh
+                EventAgc(k) = agc(i);
+                EventTime(k) = time(i);
+                k = k + 1;
+            end
         end
-    end
-    
-    if (~isempty(time)) % If not empty (expected)
         % Break data into blocks
         tot_time = time(end)-time(1); % Total time
         if (end_time-start_time <= 24*60*60) % If less than/equal a day
             hold on
             plot(gca,time, agc,'go','MarkerSize',6,'MarkerFaceColor','g');
             if exist('EventTime','var')
-                plot(gca,EventTime,EventAgc,'ro','MarkerSize',6,'MarkerFaceColor','r');
+                plot(gca,EventTime,EventAgc,'ro','MarkerSize',6,...
+                    'MarkerFaceColor','r');
             end
             hold off
         else
@@ -114,9 +105,11 @@ for ii = 1:length(fileNames) % Most certainly only length=1
             end
             % Plot
             hold on
-            plot(gca, plotted_time, plotted_agc, 'go','MarkerSize',6,'MarkerFaceColor','g');
+            plot(gca, plotted_time, plotted_agc, 'go','MarkerSize',6,...
+                'MarkerFaceColor','g');
             if exist('EventTime','var')
-                plot(gca,EventTime,EventAgc,'ro','MarkerSize',6,'MarkerFaceColor','r');
+                plot(gca,EventTime,EventAgc,'ro','MarkerSize',6,...
+                    'MarkerFaceColor','r');
             end
             hold off
         end

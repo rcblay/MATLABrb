@@ -15,8 +15,10 @@ directory = '/home/dma/Documents/CUvsSUcompare/data/CU_SiGe_1';
 x_tick_location = 1; % Daily
 logname = 'CU';
 file_name = ['/*' logname '_AGC*AGC.bin'];
+thresh = 0.9;
+pts_under_thrsh = 5;
 [CU_plot_fid, CU_plotted_time, CU_plotted_agc] = AGC_Plotting(start_time...
-    , end_time,  directory, file_name, x_tick_location,logname);
+    , end_time,  directory, file_name, x_tick_location,thresh,pts_under_thrsh);
 close(CU_plot_fid);
 
 %% CU 2
@@ -24,8 +26,10 @@ directory = '/home/dma/Documents/CUvsSUcompare/data/CU_SiGe_2';
 x_tick_location = 1; % Daily
 logname = 'CU';
 file_name = ['/*' logname '_AGC*AGC.bin'];
+thresh = 0.7;
+pts_under_thrsh = 5;
 [CU2_plot_fid, CU2_plotted_time, CU2_plotted_agc] = AGC_Plotting(start_time...
-    , end_time, directory, file_name, x_tick_location,logname);
+    , end_time, directory, file_name, x_tick_location,thresh,pts_under_thrsh);
 close(CU2_plot_fid);
 
 %% NT1065
