@@ -1,28 +1,9 @@
 % Background Loop
-% Description:
-
-%% Housekeeping
-clearvars
-close all
-clc
-
-%% Set Initial Parameter Values
-init; % Set or randomize initial parameter values
-initSettings;
-load(calib_file); % Loads in steps_agc, & steps_atten from calibration.mat
-
-%% Check for Existing Variables/Out Folder
-% (1 = name(trig_value) is a variable in the workspace) 
-if exist('trig_value','var')~=1 % var = kind (checks only for variables)
-    trig_value = 0;
-end
-% If the folder out_folder doesn't exist (checks only for folders)
-if ~exist(out_folder,'dir') 
-    mkdir(out_folder); % Make new folder called out_folder
-end
+% Description: Infinite while loop that checks every day whether there is
+% a new file to read in and plot. Plots Daily AGC, Daily Spectrum plots,
+% and any Trigger Spectrum Plots.
 
 while (1) 
-    
     %% Plot the Daily AGC data
     D = dir(folder); % D is struct of contents of folder, i.e. SiGe data
     nf = numel(D); % Number of files/directories in folder is set to nf
@@ -54,9 +35,7 @@ while (1)
                 continue;
             end
             % If jpg does not already exists, then it enters AGC_plotting
-            % to be plotted. 50,000 points to be plotted, threshold for
-            % jammers/spoofers is threshold (0.95), x_tick_location = 0 for
-            % hourly x ticks
+            % to be plotted. x_tick_location = 0 for hourly x ticks
             [fid, ~, ~] = AGC_Plotting(start_time, end_time,folder, ...
                 ['/*' logname '_AGC*AGC.bin'], x_tick_location,logname);
             if (fid ~= -1) % If file exists, title it, set size, and save
@@ -115,9 +94,11 @@ while (1)
                 if strcmp(b{1}{1},'_AUTO_') % Checks for AUTO, else DETECT
                     % Names file for automatically saved data (23 hours)
                     namefile = [logname,'_SpectroNominal_',strdate]; 
+                    unpck_filename = 'tempnom.bin';
                 else
                     % Names file for triggered auto save (below threshold)
-                    namefile = [logname,'_SpectroTriggered_',strdate]; 
+                    namefile = [logname,'_SpectroTriggered_',strdate];
+                    unpck_filename = 'temptrig.bin';
                 end
                 % Check if exists already, and if so skips to next file
                 if(exist([out_folder,'/',namefile,'.jpg'],'file'))
@@ -153,7 +134,8 @@ while (1)
                     settings.msToProcess = floor((stt(end)-(stt(1)+0.1))*1000); 
                     start_time = stt(1);
                     unpack_cplx([folder,'/',c{1}{1},'.IF.bin'], ...
-                        'temp.bin'); % Unpack & change name to temp.bin
+                        unpck_filename); % Unpack & change name to temp.bin
+                    settings.fileName = unpck_filename;
                     init_tracking;
                     if(isempty(trackResults))
                         plot(sagc,stt-stt(1),'k'); % plot AGC black
@@ -184,13 +166,13 @@ while (1)
                         xlim(h_agc_CNo(2), [25 55]);
                     end
                     % Spectro
-                    % what is spectro_cplx?, Unpack IF data and do the
-                    % magic of making the nice spectrum plot
                     
                     % Below should be spectrum producer without unpacking
                     % again
-                    unpacked_coeff = 4; % Unpacked is 4*size of packed
-                    [F,T,P] = spectro('temp.bin',1024,sagc,steps_atten,...
+                    % Unpacked is 4*size of packed, goes from 2 bits to one
+                    % byte for SiGe Data
+                    unpacked_coeff = 4; 
+                    [F,T,P] = spectro(unpck_filename,1024,sagc,steps_atten,...
                         steps_agc,sampling_freq,unpacked_coeff);  
                     h_spectr_plot = pcolor(h_spectr,F*1e-6,T,10*log10(P));
                     set(h_spectr_plot,'LineStyle','none'); % No line

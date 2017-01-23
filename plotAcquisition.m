@@ -36,7 +36,7 @@ function plotAcquisition(acqResults,settings)
 
 
 %% Plot all GPS results ===================================================
-init;
+%init;
 
 fid = figure(101); % no fid =
 
