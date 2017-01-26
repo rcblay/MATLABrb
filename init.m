@@ -7,7 +7,7 @@ close all
 clc
 
 %% Sets parameters
-folder = '/home/dma/Documents/CUvsSUcompare/data/CU_SiGe_1';
+folder = '/home/dma/Documents/CUvsSUcompare/data/test';
 out_folder = [folder,'/figures'];
 activate_matlab_fig = 0;
 activate_IF_generation = 1;

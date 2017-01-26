@@ -12,12 +12,13 @@ while (1)
         file=D(i).name; 
         out = char(file); % Changes from cell to string
         % Change start from 4 to 5 depending on log, i.e. not CU
-        stuff = out(4:end-19); 
+        stuff = out(4:end-28); %19 for unixtime stamp
         fileAGC = char('AGC');
         % If CU_AGC file, (excludes AUTO or TRIGGER files or other files)
         if strcmp(stuff,fileAGC) == 1 
-            % Filename set to 10-digit date of file
-            filename= str2num(out(8:end-8)); 
+            % Filename set to %Y-%m-%dT%H-%M-%S then converted to unixtime
+            datestring = out(8:end-8);
+            filename = conv_to_unixtime(datestring);
             start_time = filename; % Day collection began
             end_time = start_time + (24*60*60); % Day collection ended
             x_tick_location = 0; % 0 refers to hourly plot
@@ -67,10 +68,10 @@ while (1)
         [a,b] = regexp(D(j).name,[logname,...
             '(_DETECT_|_AUTO_)(.)*.AGC.bin$'],'start','tokens'); 
         if(~isempty(a)) % Not empty, meaning it is a DETECT/AUTO file
-            date = str2double(b{1}{2}); % Ten digit date
+            date = conv_to_unixtime(b{1}{2});
             sampling_freq = 16.3676e6/4; % Oscillator freq divided by 4
             trig_value = 0;
-            % Checks for D(j).name match, c is CU_AGC_########## 
+            % Checks for D(j).name match, c is CU_AGC_%Y-%m-%dT%H-%M-%S
             c = regexp(D(j).name,'(.)*.AGC.bin$','tokens'); 
             % Get AGC and Time values of this file
             % binary conversion when opening, b refers to big endian

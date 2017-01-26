@@ -29,8 +29,9 @@ plotted_agc = [];
 rawData = dir(strcat(directory,file_name));% Lists files that match format
 % Get the unix times from the file names
 fileNames = {rawData.name}; % Cell arrays with names
-fileDate = regexp(fileNames, '\d{10,10}', 'match'); % Match name and date
-fileDate = [fileDate{:}]; % Concatenate all cells into one string
+% Match date
+fileDate_str = regexp(fileNames, ['_AGC_(.)*.AGC.bin$'], 'tokens'); 
+fileDate_str = [fileDate_str{:}]; % Concatenate all cells into one string
 if(isempty(fileNames)) % No files found, return
     disp(['No AGC files were found in the directory '...
         'that matched the file name']);
@@ -38,7 +39,12 @@ if(isempty(fileNames)) % No files found, return
     plot_start_time = -1;
     return;
 end
-fileDate = cellfun(@str2num,fileDate); % Converts each cell from str to num 
+% Change to strings then to unixtime stamps
+for i = 1:length(fileDate_str)
+    string = [fileDate_str{i}];
+    string2 = string{:};
+    fileDate(i) = conv_to_unixtime(string2);
+end
 % Make sure the dates are in ascending order
 [fileDate, idx] = sort(fileDate); % Shows fileDate and index organized
 fileNames = fileNames(idx); % Reorganize files in same order as fileDate
