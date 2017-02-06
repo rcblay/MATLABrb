@@ -6,8 +6,11 @@ clearvars
 close all
 clc
 
+%% Adds Folders to Path
+addpaths;
+
 %% Sets parameters
-folder = '/data';
+folder = '/home/dma/Documents/CUvsSUcompare/data/CU_SiGe_1';
 out_folder = [folder,'/figures'];
 activate_matlab_fig = 0;
 activate_IF_generation = 1;
@@ -15,27 +18,27 @@ period = 86400.0;
 calib_file = 'calibration.mat';
 sampling_freq =  8.183800e6;
 threshold = 0.95;
-logname = 'SU'; %'rec'
+logname = 'CU'; %'rec'
 
 %% Trigger Settings
 thresh = 0.9; % Voltage threshold
 pts_under_thrsh = 5; % # of pts under threshold that constitutes a trigger
 
-%% Time zone
-use_local_timezone = 1; %1-AUTO 0-MANUAL
-%if 0 indicate an other timezone ID, examples : 
-% for Boulder,CO : 'US/Mountain'
-% for Stanford,CA : 'US/Pacific'
-% for Taiwan : 'Asia/Taipei'
-local_zone = 'US/Mountain';
-
-import java.util.*;
-if use_local_timezone==1
-    c = Calendar.getInstance();
-    z = c.getTimeZone();
-else
-    z = TimeZone.getTimeZone(local_zone);
-end
+% %% Time zone
+% use_local_timezone = 1; %1-AUTO 0-MANUAL
+% %if 0 indicate an other timezone ID, examples : 
+% % for Boulder,CO : 'US/Mountain'
+% % for Stanford,CA : 'US/Pacific'
+% % for Taiwan : 'Asia/Taipei'
+% local_zone = 'US/Mountain';
+% 
+% import java.util.*;
+% if use_local_timezone==1
+%     c = Calendar.getInstance();
+%     z = c.getTimeZone();
+% else
+%     z = TimeZone.getTimeZone(local_zone);
+% end
 
 %% Set Initial Settings and Load in Calibration Data
 initSettings;

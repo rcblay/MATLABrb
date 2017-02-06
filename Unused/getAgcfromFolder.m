@@ -1,5 +1,5 @@
 function [ntt,agc,file_list] = getAgcfromFolder(logname,t_start,t_end,folder)
-
+% Gets all agc from a folder
 D = dir(folder);
 
 AGC_file_time_length = 3600*24;
