@@ -49,7 +49,7 @@ end
 [fileDate, idx] = sort(fileDate); % Shows fileDate and index organized
 fileNames = fileNames(idx); % Reorganize files in same order as fileDate
 % All files after start_date and before end_time are true
-file_index =  (fileDate + 86399 >= start_time) & (fileDate <= end_time); 
+file_index =  (fileDate + 86399 >= start_time) & (fileDate < end_time); 
 fileNames = fileNames(file_index); % Only files after start and before end
 if(isempty(fileNames)) % Checks if empty
     disp('No data was found in the time range');

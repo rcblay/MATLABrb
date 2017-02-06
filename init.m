@@ -7,7 +7,7 @@ close all
 clc
 
 %% Sets parameters
-folder = '/home/dma/Documents/CUvsSUcompare/data/test';
+folder = '/data';
 out_folder = [folder,'/figures'];
 activate_matlab_fig = 0;
 activate_IF_generation = 1;
@@ -15,7 +15,7 @@ period = 86400.0;
 calib_file = 'calibration.mat';
 sampling_freq =  8.183800e6;
 threshold = 0.95;
-logname = 'CU'; %'rec'
+logname = 'SU'; %'rec'
 
 %% Trigger Settings
 thresh = 0.9; % Voltage threshold
