@@ -1,5 +1,5 @@
 function samexaxis(varargin)
-%% helper function to clean up subplots that have common x axises
+%% Helper function to clean up subplots that have common x axises(modified)
 %
 % USAGE: samexaxis([optionalarguments])
 % 

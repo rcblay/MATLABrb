@@ -1,2 +1,3 @@
-% Adds all necessary paths
-addpath('ComparisonPlotScripts','NT1065scripts','SDRtracking');
+% Adds all necessary folders as paths
+addpath('ComparisonPlotScripts','NT1065scripts','SDRtracking',...
+    'EmailFunctions');

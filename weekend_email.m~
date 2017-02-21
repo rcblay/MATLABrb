@@ -1,0 +1,13 @@
+clearvars attachment
+
+
+
+subject = ['Weekly Email Report on ' logname ' System'];
+
+bodystr = ['This is the ' logname ' system weekly report.',...
+    'Please see attached plots.'];
+
+body = bodystr;
+
+%% Send AGC Email
+sendemailAGC(recipients,subject,body,attachments)

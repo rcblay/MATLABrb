@@ -12,33 +12,22 @@ addpaths;
 %% Sets parameters
 folder = '/home/dma/Documents/CUvsSUcompare/data/CU_SiGe_1';
 out_folder = [folder,'/figures'];
-activate_matlab_fig = 0;
-activate_IF_generation = 1;
-period = 86400.0;
+activate_IF_generation = 1; % Flag used to plot spectrum plots
+grow_check = 1; % Check if file is still growing
+period = 86400.0; % Time to pause to take data
 calib_file = 'calibration.mat';
 sampling_freq =  8.183800e6;
-threshold = 0.95;
 logname = 'CU'; %'rec'
+localUTC = 17;
+
+%% Automated Email Settings
+recipients = {'rcblay@gmail.com'};%,'dma@colorado.edu'};
+emailtrig = 1;
+weekend_email = 1;
 
 %% Trigger Settings
 thresh = 0.9; % Voltage threshold
 pts_under_thrsh = 5; % # of pts under threshold that constitutes a trigger
-
-% %% Time zone
-% use_local_timezone = 1; %1-AUTO 0-MANUAL
-% %if 0 indicate an other timezone ID, examples : 
-% % for Boulder,CO : 'US/Mountain'
-% % for Stanford,CA : 'US/Pacific'
-% % for Taiwan : 'Asia/Taipei'
-% local_zone = 'US/Mountain';
-% 
-% import java.util.*;
-% if use_local_timezone==1
-%     c = Calendar.getInstance();
-%     z = c.getTimeZone();
-% else
-%     z = TimeZone.getTimeZone(local_zone);
-% end
 
 %% Set Initial Settings and Load in Calibration Data
 initSettings;

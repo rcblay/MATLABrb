@@ -17,7 +17,7 @@ for i = (3:nf) % Skips to 3 because 1 and 2 are . and ..
     if length(out) < 20
         continue;
     end
-    
+    % For all cases of filenames, finds timestamp and before/after segments
     if out(4:6) == 'AGC'
         timestamp = str2num(out(8:17));
         if out(18) == 'T'
@@ -44,6 +44,7 @@ for i = (3:nf) % Skips to 3 because 1 and 2 are . and ..
         continue;
     end
     datevec = unixtime(timestamp);
+    % Adds preceding zero if less than 10
     for i = 1:6
         if datevec(i) < 10
             datestring{i} = ['0' num2str(datevec(i))];
