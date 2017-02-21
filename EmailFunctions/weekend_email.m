@@ -13,7 +13,7 @@ attachments = gather_week_plots(directory,start_time,end_time);
 subject = ['Weekly Email Report on ' logname ' System'];
 
 bodystr = ['This is the ' logname ' system weekly report.',...
-    'Please see attached plots for all plots created/modified in last week.'];
+    ' Please see attached plots for all plots created/modified in last week.'];
 
 body = bodystr;
 
