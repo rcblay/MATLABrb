@@ -10,7 +10,7 @@ clc
 addpaths;
 
 %% Sets parameters
-folder = '/home/dma/Documents/CUvsSUcompare/data/CU_SiGe_1';
+folder = '/home/gnss/SiGe/Sean_SiGe_Stuff/data';
 out_folder = [folder,'/figures'];
 activate_IF_generation = 1; % Flag used to plot spectrum plots
 grow_check = 1; % Check if file is still growing
@@ -21,9 +21,9 @@ logname = 'CU'; %'rec'
 localUTC = 17;
 
 %% Automated Email Settings
-recipients = {'rcblay@gmail.com'};%,'dma@colorado.edu'};
+recipients = {'rcblay@gmail.com','dma@colorado.edu'};
 emailtrig = 1;
-weekend_email = 1;
+weekendemail = 1;
 
 %% Trigger Settings
 thresh = 0.9; % Voltage threshold
