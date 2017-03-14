@@ -214,9 +214,9 @@ while (1)
                     out_folder namefile D period trig_value var ...
                     processed last_modified_date steps_agc steps_atten ...
                     folder activate_IF_generation calib_file ...
-                    sampling_freq logname MyExternalIP ...
+                    sampling_freq logname MyExternalIP weekend_email ...
                     MyExternalIP z i thresh pts_under_thrsh emailtrig ...
-                    recipients unpck_filename trigtime grow_check
+                    recipients unpck_filename trigtime grow_check localUTC
                 saveas(h_fig,[out_folder,'/',namefile,'.jpg']);
                 close(h_fig);
                 fprintf('SAVED\n');
@@ -234,13 +234,17 @@ while (1)
 
     cl = clock;
     % Finds amount of seconds until 5 pm to pause
-    if cl(4) < 17 % If less than 5 pm
-        pausetime = (17-cl(4)-1)*3600 + (60-cl(5))*60 + (60-cl(6));
+    if cl(4) < localUTC % If less than 5 pm
+        pausetime = (localUTC-cl(4)-1)*3600 + (60-cl(5))*60 + floor(60-cl(6));
     else % If greater than 5 pm
-        pausetime = (24-cl(4)+17-1)*3600 + (60-cl(5))*60 + (60-cl(6));
+        pausetime = (24-cl(4)+localUTC-1)*3600 + (60-cl(5))*60 + floor(60-cl(6));
     end
     % Long sleep to make it very low frequency
-    disp(['Work done ! Next in ',num2str(period),' sec.']);
+    disp(['Work done! Next loop in ',num2str(pausetime),' sec. at 00:00 UTC']);
     close all;
-    pause(period);
+    % Sunday, won't work 100 % if it is started on Sunday
+    if weekday(datestr(clock,'mm/dd/yy')) == 1 && weekend_email == 1
+        weekend_email(logname,recipients,out_folder);
+    end
+    pause(pausetime);
 end

@@ -10,16 +10,15 @@ clc
 addpaths;
 
 %% Sets parameters
-% Make sure to change initSettings if needed
-folder = '/home/dma/Documents/CUvsSUcompare/data/CU_SiGe_1';
+folder = '/home/dma/Sean_SiGe_Stuff/data';
 out_folder = [folder,'/figures'];
 activate_IF_generation = 1; % Flag used to plot spectrum plots
 grow_check = 1; % Check if file is still growing
-is_data_logging = 1; % Should data still be logging?
+period = 86400.0; % Time to pause to take data
 calib_file = 'calibration.mat';
+sampling_freq =  8.183800e6;
 logname = 'CU'; %'rec'
-localUTC = 18;
-Ahead_Behind = 0; % Ahead of UTC = 1 (Korea), Behind UTC = 0 (Boulder)
+localUTC = 17;
 
 %% Automated Email Settings
 recipients = {'rcblay@gmail.com','dma@colorado.edu'};
@@ -35,10 +34,14 @@ initSettings;
 load(calib_file); % Loads in steps_agc, & steps_atten from calibration.mat
 
 %% Check for Existing Variables/Out Folder
+% (1 = name(trig_value) is a variable in the workspace) 
+if exist('trig_value','var')~=1 % var = kind (checks only for variables)
+    trig_value = 0;
+end
 % If the folder out_folder doesn't exist (checks only for folders)
 if ~exist(out_folder,'dir') 
     mkdir(out_folder); % Make new folder called out_folder
 end
 
 %% Runs File Analyzer Loop
-background_loop;
+background_loopNT;

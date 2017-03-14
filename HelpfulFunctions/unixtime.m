@@ -3,7 +3,7 @@ function [outputtime] = unixtime(inputtime)
 % transforms a date vector to a ten digit unix timestamp
 
 % unixtime is seconds since 1.1.1970
-% matlabtime is days after 1.1.000
+% matlabtime is days after 1.1.0000
 
 if size(inputtime,1) == 0 %no input time
    outputtime = [];
