@@ -128,6 +128,7 @@ while (1)
                     is_IF = 1;
                     break;
                 end
+<<<<<<< HEAD
             end
             % Plot the spectrogram and the AGC
             h_fig = figure(919); % Assigns figure handle
@@ -178,6 +179,46 @@ while (1)
                     set(h_agc_CNo(2),'FontSize',16)
                     xlim(h_agc_CNo(1), [0.0 1.4]);
                     xlim(h_agc_CNo(2), [25 55]);
+=======
+                % Do a bunch of fancy settings to make plot look nice
+                ylabel(h_spectr,'Time [s]','FontSize',16); % Time
+                xlabel(h_spectr,'Frequency [MHz]','FontSize',16); % Freq
+                % Title
+                UTC_time = datenum([1970 1 1 0 0 stt(1)]);
+                title_fig = {logname,['First Unix Timestamp : ',...
+                    num2str(stt(1))],['First UTC Time : ',...
+                    datestr(UTC_time)]}; % 2 times
+                title ('Parent',h_spectr,title_fig,'Units','normalized',...
+                    'Position',[1.0 1.2],'VerticalAlignment','middle',...
+                    'FontSize',12);
+                % Colorbar
+                h_colorbar = colorbar('peer',h_spectr,'NorthOutside');
+                set(h_colorbar,'Position',[0.1 0.8 0.4 0.01]);
+                set(h_colorbar,'FontSize',16)
+                colormap(jet(1024));
+                colormark = 10*log10(P);
+                maxcolor = max(max(colormark));
+                mincolor = min(min(colormark));
+                set(h_spectr,'CLim',[mincolor maxcolor]); % Color spectrum
+                set(h_spectr,'FontSize',16)
+                % Clear tracking results
+                clearvars -except nf start_time end_time h_fig ...
+                    out_folder namefile D period trig_value var ...
+                    processed last_modified_date steps_agc steps_atten ...
+                    folder activate_IF_generation calib_file ...
+                    sampling_freq logname MyExternalIP weekendemail ...
+                    MyExternalIP z i thresh pts_under_thrsh emailtrig ...
+                    recipients unpck_filename trigtime grow_check localUTC
+                saveas(h_fig,[out_folder,'/',namefile,'.jpg']);
+                close(h_fig);
+                fprintf('SAVED\n');
+                if strcmp(unpck_filename,'temptrig.bin') && emailtrig == 1
+                    dailyplot = find_file_with_trig(trigtime,folder);
+                    attachments = {[out_folder,'/',namefile,'.jpg'],...
+                        dailyplot};
+                    time = namefile(21:end);
+                    send_trig_email(time,logname,attachments,recipients);
+>>>>>>> e18c0b06bf44ea4873a6daec397609a0dadb5a3d
                 end
                 % Spectro
                 
@@ -245,8 +286,13 @@ while (1)
     disp(['Work done! Next loop in ',num2str(pausetime),' sec. at 00:00 UTC']);
     close all;
     % Sunday, won't work 100 % if it is started on Sunday
+<<<<<<< HEAD
     if weekday(datestr(clock,'mm/dd/yy')) - Ahead_Behind == 1 && weekendemail == 1
         weekend_email(logname,recipients,out_folder,folder,thresh,pts_under_thrsh);
+=======
+    if weekday(datestr(clock,'mm/dd/yy')) == 1 && weekendemail == 1
+        weekend_email(logname,recipients,out_folder);
+>>>>>>> e18c0b06bf44ea4873a6daec397609a0dadb5a3d
     end
     
     % Check if files are still growing

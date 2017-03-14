@@ -10,8 +10,12 @@ clc
 addpaths;
 
 %% Sets parameters
+<<<<<<< HEAD
 % Make sure to change initSettings if needed
 folder = '/home/dma/Documents/CUvsSUcompare/data/CU_SiGe_1';
+=======
+folder = '/home/gnss/SiGe/Sean_SiGe_Stuff/data';
+>>>>>>> e18c0b06bf44ea4873a6daec397609a0dadb5a3d
 out_folder = [folder,'/figures'];
 activate_IF_generation = 1; % Flag used to plot spectrum plots
 grow_check = 1; % Check if file is still growing
