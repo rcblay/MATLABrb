@@ -6,14 +6,9 @@ function [plot_fid, plotted_time, plotted_agc] = AGC_Plotting(start_time...
 %   points_per_day:   number of points to be plotted in one day
 %   directory:        directory where the AGC data files are located
 %   file_name:        search name for AGC data files (ex.
-%                       /*korea_AGC*AGC.bin')
+%                       ['/*' logname '_AGC*AGC.bin'])
 %   AGC_threshold:    threshold of AGC data that defines when the reciever
 %                       detects jammers or spoofers
-%   x_tick_location: determines the location for x-axis tick marks.
-%                       0=hourly
-%                       1=daily
-%                       2=weekly
-%                       3=monthly
 % output:
 %   plot of the AGC data between the start and end times
 %   fid:                the id for the figure so it can be saved or
@@ -25,7 +20,7 @@ function [plot_fid, plotted_time, plotted_agc] = AGC_Plotting(start_time...
 plotted_time = [];
 plotted_agc = [];
 plotted_EventTime = [];
-plotted_EventAgc = [];
+plotted_EventAGC = [];
 
 %% Find Files in Time Range
 rawData = dir(strcat(directory,file_name));% Lists files that match format
@@ -38,7 +33,6 @@ if(isempty(fileNames)) % No files found, return
     disp(['No AGC files were found in the directory '...
         'that matched the file name']);
     plot_fid = -1;
-    plot_start_time = -1;
     return;
 end
 % Change to strings then to unixtime stamps
@@ -56,7 +50,6 @@ fileNames = fileNames(file_index); % Only files after start and before end
 if(isempty(fileNames)) % Checks if empty
     disp('No data was found in the time range');
     plot_fid = -1;
-    plot_start_time = -1; % Might be unnecessary
     return;
 end
 fileDate = fileDate(file_index); % Now only dates in time range
@@ -87,68 +80,43 @@ for ii = 1:length(fileNames)
         % Checks for trigger events
         for i = 1:length(agc)-pts_under_thrsh
             if agc(i:i+pts_under_thrsh-1) < thresh
-                EventAgc(k) = agc(i);
+                EventAGC(k) = agc(i);
                 EventTime(k) = time(i);
                 k = k + 1;
             end
         end
-        % Break data into blocks
-        tot_time = time(end)-time(1); % Total time
-        if (end_time-start_time <= 24*60*60) % If less than/equal a day
-            hold on
-            plot(gca,time, agc,'go','MarkerSize',6,'MarkerFaceColor','g');
-            if exist('EventTime','var')
-                plot(gca,EventTime,EventAgc,'ro','MarkerSize',6,...
-                    'MarkerFaceColor','r');
-            end
-            hold off
-        else
-            plotted_time = [plotted_time; time];
-            plotted_agc = [plotted_agc; agc];
-
-            % Check if there was no data plotted and return
-            if isempty(plotted_time)
-                disp('No data was found for the time range specified');
-                close(plot_fid);
-                plot_fid = -1;
-                return;
-            end
-            % Plot
-            hold on
-            plot(gca, plotted_time, plotted_agc, 'go','MarkerSize',6,...
-                'MarkerFaceColor','g');
-            if exist('EventTime','var')
-                plotted_EventTime = [plotted_EventTime; EventTime];
-                plotted_EventAGC = [plotted_EventAGC; EventAGC];
-                plot(gca,plotted_EventTime,plotted_EventAgc,'ro','MarkerSize',6,...
-                    'MarkerFaceColor','r');
-            end
-            hold off
+        % Plot
+        plotted_time = [plotted_time; time];
+        plotted_agc = [plotted_agc; agc];
+        
+        % Check if there was no data plotted and return
+        if isempty(plotted_time)
+            disp('No data was found for the time range specified');
+            close(plot_fid);
+            plot_fid = -1;
+            return;
         end
+        % Plot
+        hold on
+        plot(gca, plotted_time, plotted_agc, 'go','MarkerSize',6,...
+            'MarkerFaceColor','g');
+        if exist('EventTime','var')
+            plotted_EventTime = [plotted_EventTime; EventTime];
+            plotted_EventAGC = [plotted_EventAGC; EventAGC];
+            plot(gca,plotted_EventTime,plotted_EventAGC,'ro','MarkerSize',6,...
+                'MarkerFaceColor','r');
+        end
+        hold off
     end
 end
 
 %% Scale the X-Axis
 % Check if the x ticks are supposed to be every hour
-
-if ~isempty(plotted_time)
-    tot_time = plotted_time(end) - plotted_time(1);
-end
-
 [tick_loc,tick_label] = scale_x_axis(start_time,end_time);
-
-if isempty(plotted_time)
-    plotted_time = time;
-    plotted_agc = agc;
-end
 
 %% Set Plot Parameters
 % Set x axis limits
-if (tot_time <= 86400)
-    xlim([min(time), max(time)]);
-else
-    xlim([min(plotted_time)-2, max(plotted_time)+2]);
-end
+xlim([min(plotted_time)-2, max(plotted_time)+2]);
 ylim([0.1 1.35])
 set(gca, 'XTick', tick_loc); % Set x ticks to the tick locations
 set(gca, 'xTickLabel', tick_label); % Set x tick labels to tick_label

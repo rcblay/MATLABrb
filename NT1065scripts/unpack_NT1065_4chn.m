@@ -1,4 +1,4 @@
-function unpack_NT1065(filename_in,filename_out,L1L2)
+function unpack_NT1065_4chn(filename_in,filename_out,L1L2G1G2)
 
 fid = fopen(filename_in,'rb');
 fid_out = fopen(filename_out,'wb');
@@ -22,11 +22,11 @@ for n = 0:nl-1
     
     data = fread(fid, npiece,'uint8'); % read the data from the opened file - fid
     
-    data_2file = zeros(2*numel(data),1);
-    if L1L2 == 1
-        data_2file(1:2:end) = LUT_I_long1(data+1);
-        data_2file(2:2:end) = LUT_Q_long1(data+1);
-    elseif L1L2 == 2
+    data_2file = zeros(numel(data),1);
+    if L1L2G1G2 == 1
+        data_2file(1:2:end) = LUT_I_long1(data(1:2:end)+1);
+        data_2file(2:2:end) = LUT_Q_long1(data(1:2:end)+1);
+    elseif L1L2G1G2 == 2
         data_2file(1:2:end) = LUT_I_long2(data+1);
         data_2file(2:2:end) = LUT_Q_long2(data+1);
     end

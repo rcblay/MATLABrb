@@ -1,4 +1,5 @@
-function [time_k2, ApproxGain3,RF_GainSt3] = parseFileAGC2(filename,Channels,timerange,TimeStart,Day)
+function [time_k2, ApproxGain3,RF_GainSt3] = parseFileAGC2(filename,...
+    Channels,timerange,TimeStart,Day)
 % parseFileAGC2: Function that parses regdump.bin file from NT1065 and  
 %                plots meaningful data like RF Gain.
 % Inputs: filename: directory + filename of file to parse
@@ -134,8 +135,8 @@ end
 for i = 1:len
     k = 1;
     for ii = 1:length(ApproxGain3(:,Channels(i)))-1
-        if ApproxGain3(ii,Channels(i)) < 26
-            if ApproxGain3(ii+1,Channels(i)) < 26
+        if ApproxGain3(ii,Channels(i)) < 40
+            if ApproxGain3(ii+1,Channels(i)) < 40
                 EventTime(k,Channels(i)) = time_k2(ii,Channels(i));
                 EventGain(k,Channels(i)) = ApproxGain3(ii,Channels(i));
                 k = k + 1;

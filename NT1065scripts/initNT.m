@@ -10,34 +10,32 @@ clc
 addpaths;
 
 %% Sets parameters
-folder = '/home/dma/Sean_SiGe_Stuff/data';
+% Make sure to change initSettings if needed
+folder = '/home/dma/Documents/CUvsSUcompare/data/NT1065';
 out_folder = [folder,'/figures'];
 activate_IF_generation = 1; % Flag used to plot spectrum plots
 grow_check = 1; % Check if file is still growing
-period = 86400.0; % Time to pause to take data
-calib_file = 'calibration.mat';
-sampling_freq =  8.183800e6;
+is_data_logging = 0; % Should data still be logging?
+calib_file = 'calibration.mat'; % DIFFERENT FOR NT1065 but how?
 logname = 'CU'; %'rec'
-localUTC = 17;
+localUTC = 18;
+Ahead_Behind = 0; % Ahead of UTC = 1 (Korea), Behind UTC = 0 (Boulder)
 
 %% Automated Email Settings
 recipients = {'rcblay@gmail.com','dma@colorado.edu'};
-emailtrig = 1;
-weekendemail = 1;
+emailtrig = 0;
+weekendemail = 0;
 
-%% Trigger Settings
-thresh = 0.9; % Voltage threshold
-pts_under_thrsh = 5; % # of pts under threshold that constitutes a trigger
+%% Channel/Trigger Settings
+channels = [1 2 3 4]; % Must match # of elements in thresh/pts_under_thrsh
+thresh = [42 42 42 42]; % Voltage threshold
+pts_under_thrsh = [5 5 5 5]; % # of pts under thresh to constitute trigger
 
 %% Set Initial Settings and Load in Calibration Data
 initSettings;
-load(calib_file); % Loads in steps_agc, & steps_atten from calibration.mat
+%load(calib_file); % Loads in steps_agc, & steps_atten from calibration.mat
 
 %% Check for Existing Variables/Out Folder
-% (1 = name(trig_value) is a variable in the workspace) 
-if exist('trig_value','var')~=1 % var = kind (checks only for variables)
-    trig_value = 0;
-end
 % If the folder out_folder doesn't exist (checks only for folders)
 if ~exist(out_folder,'dir') 
     mkdir(out_folder); % Make new folder called out_folder

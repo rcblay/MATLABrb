@@ -4,6 +4,11 @@
 % and any Trigger Spectrum Plots.
 
 while (1) 
+    if Ahead_Behind == 0 % Behind
+        offset = [', (Local: UTC-',num2str(24-localUTC),')'];
+    else % Ahead
+        offset = [', (Local: UTC+',num2str(localUTC),')'];
+    end
     %% Plot the Daily AGC data
     D = dir(folder); % D is struct of contents of folder, i.e. SiGe data
     nf = numel(D); % Number of files/directories in folder is set to nf
@@ -22,7 +27,7 @@ while (1)
             filename = conv_to_unixtime(datestring);
             start_time = filename; % Day collection began
             plotdate = unixtime(filename); % Changes to date vector
-            strdate = datestr(plotdate);
+            strdate = datestr(plotdate,0);
             strdate(strdate == ' ') = '_';
             strdate(strdate == ':') = '-';
             FN = [logname,'_DailyAGC_',strdate];
@@ -42,6 +47,7 @@ while (1)
                     continue;
                 end
             end
+            
             % Find end_time by looking at last time entry in file
             fid = fopen(char([folder, '/', file]));
             data = fread(fid, 'uint32'); % read bin file 4 bytes at a time
@@ -53,9 +59,10 @@ while (1)
             [fid, ~, ~] = AGC_Plotting(start_time, end_time,folder, ...
                 ['/*' logname '_AGC*AGC.bin'],thresh,pts_under_thrsh);
             if (fid ~= -1) % If file exists, title it, set size, and save
+                xlabel(['UTC Time',offset])
                 title(gca, [logname ' Daily AGC Data (from ', ...
-                    datestr(unixtime(start_time)), ' to ', ...
-                    datestr(unixtime(end_time)), ' [UTC])']);grid;
+                    datestr(unixtime(start_time),0), ' to ', ...
+                    datestr(unixtime(end_time),0), ' [UTC])']);grid;
                 set(fid,'units','normalized','outerposition',[0 0 1 1])
                 set(gca,'FontSize',16)
                 saveas(fid, [out_folder '/' logname '_DailyAGC_', ...
@@ -100,7 +107,7 @@ while (1)
             % Save the captured info for the sum up on
             % continuous AGC saving plot
             plotdate = unixtime(date);
-            strdate = datestr(plotdate);
+            strdate = datestr(plotdate,0);
             strdate2 = strdate;
             strdate(strdate == ' ') = '_';
             strdate(strdate == ':') = '-';
@@ -155,7 +162,7 @@ while (1)
                     plot(sagc,stt-stt(1),'k'); % plot AGC black
                     h_agc_CNo = gca;
                     set(h_agc_CNo, 'yticklabel', []);
-                    set(h_agc_CNo,'FontSize',16)
+                    set(h_agc_CNo,'FontSize',12)
                     xlabel('AGC value [V]'); % Label x-axis
                     xlim(h_agc_CNo, [0.0 1.4]); % Even spaces on x-axis
                 else
@@ -174,8 +181,8 @@ while (1)
                         ,'yticklabel',[])
                     set(h_agc_CNo(2),'Position',[0.55 0.1 0.30 0.70]...
                         ,'yticklabel', [], 'YColor', 'r')
-                    set(h_agc_CNo(1),'FontSize',16)
-                    set(h_agc_CNo(2),'FontSize',16)
+                    set(h_agc_CNo(1),'FontSize',12)
+                    set(h_agc_CNo(2),'FontSize',12)
                     xlim(h_agc_CNo(1), [0.0 1.4]);
                     xlim(h_agc_CNo(2), [25 55]);
                 end
@@ -188,6 +195,8 @@ while (1)
                 unpacked_coeff = 4;
                 [F,T,P] = spectro(unpck_filename,1024,sagc,steps_atten,...
                     steps_agc,sampling_freq,unpacked_coeff);
+                %figure(3);
+                %h_spectr_plot = mesh(F*1e-6,T,10*log10(P));
                 h_spectr_plot = pcolor(h_spectr,F*1e-6,T,10*log10(P));
                 set(h_spectr_plot,'LineStyle','none'); % No line
             end
@@ -196,22 +205,23 @@ while (1)
             xlabel(h_spectr,'Frequency [MHz]','FontSize',16); % Freq
             % Title
             UTC_time = datenum([1970 1 1 0 0 stt(1)]);
+            % Add local offset
             title_fig = {logname,['First Unix Timestamp : ',...
                 num2str(stt(1))],['First UTC Time : ',...
-                datestr(UTC_time)]}; % 2 times
+                datestr(UTC_time,0),offset]}; % 2 times
             title ('Parent',h_spectr,title_fig,'Units','normalized',...
                 'Position',[1.0 1.2],'VerticalAlignment','middle',...
                 'FontSize',12);
             % Colorbar
             h_colorbar = colorbar('peer',h_spectr,'NorthOutside');
             set(h_colorbar,'Position',[0.1 0.8 0.4 0.01]);
-            set(h_colorbar,'FontSize',16)
+            set(h_colorbar,'FontSize',12)
             colormap(jet(1024));
             colormark = 10*log10(P);
             maxcolor = max(max(colormark));
             mincolor = min(min(colormark));
             set(h_spectr,'CLim',[mincolor maxcolor]); % Color spectrum
-            set(h_spectr,'FontSize',16)
+            set(h_spectr,'FontSize',12)
             % Clear tracking results
             clearvars -except nf start_time end_time h_fig isGrow...
                 out_folder namefile D period trig_value var Ahead_Behind...
@@ -234,6 +244,7 @@ while (1)
     end
     c = regexp(D(i).name,'(.)*.bin$','tokens');
     
+    %% Find Time to UTC and send Emails
     cl = clock;
     % Finds amount of seconds until UTC to pause
     if cl(4) < localUTC % If less than UTC
