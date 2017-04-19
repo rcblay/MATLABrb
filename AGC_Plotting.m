@@ -98,13 +98,19 @@ for ii = 1:length(fileNames)
         end
         % Plot
         hold on
-        plot(gca, plotted_time, plotted_agc, 'go','MarkerSize',6,...
+        smootheda = smooth(plotted_agc,20);
+        plot(gca, plotted_time, smootheda, 'go','MarkerSize',6,...
             'MarkerFaceColor','g');
+%         plot(gca, plotted_time, plotted_agc, 'go','MarkerSize',6,...
+%             'MarkerFaceColor','g');
         if exist('EventTime','var')
             plotted_EventTime = [plotted_EventTime; EventTime];
             plotted_EventAGC = [plotted_EventAGC; EventAGC];
-            plot(gca,plotted_EventTime,plotted_EventAGC,'ro','MarkerSize',6,...
+            smoothed = smooth(plotted_EventAGC,20);
+            plot(gca,plotted_EventTime,smoothed,'ro','MarkerSize',6,...
                 'MarkerFaceColor','r');
+%             plot(gca,plotted_EventTime,plotted_EventAGC,'ro','MarkerSize',6,...
+%                 'MarkerFaceColor','r');
         end
         hold off
     end

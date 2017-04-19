@@ -1,20 +1,34 @@
-*AGC_stats : compute some statistics on the last AGC file found in the ~/Jammer/data folder and write it in a file
+MATLABrb-Visualization of AGC from SiGe
 
-*background_loop : is a loop executed every 5min that check if new files are available in the data.
-  If so it generates a report on the event and a plot of the AGC data of the day. The figures are put in ~/Jammer/data/figures
+###### Descriptions of folders
 
-*calibration.mat : is a matlab matrix that contain the AGC value as a function of the power of the white noise injected in the module.
- It was generated experimentally.
+*ComparisonPlotScripts: Scripts that give template for plotting two different SiGe systems' data together. (Not updated for a while, do not use).
 
-*datetick_custom : is like datetick function in matlab but use Unix timestamp instead of datenum and plot both UTC time and local time.
+*EmailFunctions: All scripts that are related to sending emails, or gathering plots for the emails.
 
-*getAgcfromFolder : is a function get the AGC values of a period of time going in the folder of data and reading in all the AGC files
- to find the data
+*HelpfulFunctions: Majority of scripts that do a single task that makes the main scripts easier to understand.
 
-*init : is executed by background_loop at first. It contains the parameters of the station (folders, threshold, logname, IP and timezone)
+*NT1065 Scripts: Scripts for NT1065 SiGe analysis (Still in development, do not use).
 
-*spectro_cplx : generate spectrogram directly from packed complex IF data
+*SDRtracking: Scripts used to track GPS Intermediate Frequency(IF) Signal. Used to plot C/N0 on spectrum plots and spectrograms.
 
-*start_matlab : is a shell script that start matlab and execute background_loop in a background task
+*Unused: Currently unused scripts but could potentially have use in future.
 
-*unpack_cplx : unpack the IF complex data.
+###### Descriptions of Main Scripts
+
+*addpaths.m: Tells matlab to look for needed functions/scripts in all of the above folders.
+
+*AGC_Plotting.m: Function script to plot the AGC data. Works well with any time frame of data.
+
+*background_loop.m: Main script that is started by init.m that runs the analysis of the AGC data at every end of UTC day if desired, or just analyzes any unanalyzed files. Also sends out emails of triggers, errors, and weekly reports.
+
+*calibration.mat: Important calibration data that gives the conversion between AGC voltage and white power noise in dB. Loaded in the init.m script.
+
+***init.m: Script where all settings are set and the script that you run to start the analysis. Many important settings like location of files, trigger threshold, email notification etc.
+
+*initNT.m: Script that would start the analysis of NT1065 AGC data just like init.m. (Still in development).
+
+*spectro.m: Performs fourier transform of AGC data to create spectrogram data.
+
+*unpack_cplx.m: Unpacks the GPS data so that it can be easily parsed/understood.
+

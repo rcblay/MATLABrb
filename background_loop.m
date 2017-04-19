@@ -195,9 +195,19 @@ while (1)
                 unpacked_coeff = 4;
                 [F,T,P] = spectro(unpck_filename,1024,sagc,steps_atten,...
                     steps_agc,sampling_freq,unpacked_coeff);
-                %figure(3);
-                %h_spectr_plot = mesh(F*1e-6,T,10*log10(P));
-                h_spectr_plot = pcolor(h_spectr,F*1e-6,T,10*log10(P));
+                figure(3);
+                h_spectr_plot3d = mesh((F+1575.42e6 - 38.4e3)*1e-6,T,10*log10(P));
+                xlabel('Frequency [MHz]','FontSize',16)
+                ylabel('Time [s]','FontSize',16)
+                zlabel('Power [dB]','FontSize',16)
+                UTC_time = datenum([1970 1 1 0 0 stt(1)]);
+                title({logname,['First Unix Timestamp : ',...
+                    num2str(stt(1))],['First UTC Time : ',...
+                    datestr(UTC_time,0),offset]});
+                colormap(jet(1024));
+                axis tight
+                saveas(h_spectr_plot3d,[out_folder,'/3Dplot',namefile,'.jpg']);
+                h_spectr_plot = pcolor(h_spectr,(F+1575.42e6 - 38.4e3)*1e-6,T,10*log10(P));
                 set(h_spectr_plot,'LineStyle','none'); % No line
             end
             % Do a bunch of fancy settings to make plot look nice
@@ -228,7 +238,7 @@ while (1)
                 processed last_modified_date steps_agc steps_atten ...
                 folder activate_IF_generation calib_file is_data_logging ...
                 sampling_freq logname MyExternalIP weekendemail ...
-                MyExternalIP z i thresh pts_under_thrsh emailtrig ...
+                MyExternalIP z i thresh pts_under_thrsh emailtrig offset...
                 recipients unpck_filename trigtime grow_check localUTC
             saveas(h_fig,[out_folder,'/',namefile,'.jpg']);
             close(h_fig);
