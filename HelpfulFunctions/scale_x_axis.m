@@ -11,17 +11,41 @@ tick_label = [];
 % Intervals- 0: 15 sec, 1: 1 min, 2: 2 min, 3: 5 min, 4: 15 min, 5: 30 min
 % 6: 1 hr, 7: 2 hr, 8: 6 hr, 9: 1 day, 10: 2 day, 11: 1 Week, 12: 1 Month
 
-if tot_time <= 60 % interval every 15 sec
+if tot_time <= 30 % interval every 5 sec
+    offset = mod(start_time, 5); % Find hours after day start
+    tick_loc = start_time-offset; % Find start of day by subtracting offset
+    % Create tick_label for first hour
+    tick_label = datestr(unixtime(tick_loc), 'HH:MM:SS');
+    temp_tick_loc = tick_loc;
+    while tick_loc(end) < end_time
+        temp_tick_loc = temp_tick_loc + 5;
+        tick_loc = [tick_loc, temp_tick_loc];
+        tick_label = [tick_label; datestr(unixtime(tick_loc(end)),...
+            'HH:MM:SS')];
+    end
+elseif tot_time <= 1.5*60 % interval every 15 sec
     offset = mod(start_time, 15); % Find hours after day start
     tick_loc = start_time-offset; % Find start of day by subtracting offset
-     % Create tick_label for first hour
-    tick_label = datestr(unixtime(tick_loc), 'MM:SS');
+    % Create tick_label for first hour
+    tick_label = datestr(unixtime(tick_loc), 'HH:MM:SS');
     temp_tick_loc = tick_loc;
     while tick_loc(end) < end_time
         temp_tick_loc = temp_tick_loc + 15;
         tick_loc = [tick_loc, temp_tick_loc];
         tick_label = [tick_label; datestr(unixtime(tick_loc(end)),...
-            'MM:SS')];
+            'HH:MM:SS')];
+    end
+elseif tot_time <= 3*60 % interval every 15 sec
+    offset = mod(start_time, 30); % Find hours after day start
+    tick_loc = start_time-offset; % Find start of day by subtracting offset
+     % Create tick_label for first hour
+    tick_label = datestr(unixtime(tick_loc), 'HH:MM:SS');
+    temp_tick_loc = tick_loc;
+    while tick_loc(end) < end_time
+        temp_tick_loc = temp_tick_loc + 30;
+        tick_loc = [tick_loc, temp_tick_loc];
+        tick_label = [tick_label; datestr(unixtime(tick_loc(end)),...
+            'HH:MM:SS')];
     end
 elseif tot_time <= 12*60 % interval every min
     offset = mod(start_time, 60); % Find hours after day start

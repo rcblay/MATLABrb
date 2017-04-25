@@ -6,7 +6,7 @@ function timeInterpolated = interpTime(time)
 j = 1; % current index of time
 k = length(time); % length of time so it knows when to stop
 % Loops through every sec interval
-for ij = 1:(time(end)-time(1)) % should be 86400-1
+for ij = 1:(time(end)-time(1))
     temp = time(j); % set first value to temp
     l = 1; % l is counter of spot from one sec to another
     if (j+1) == k || j == k % Breaks if at end of time

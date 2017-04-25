@@ -204,6 +204,7 @@ while (1)
                 title({logname,['First Unix Timestamp : ',...
                     num2str(stt(1))],['First UTC Time : ',...
                     datestr(UTC_time,0),offset]});
+                pause(5);
                 colormap(jet(1024));
                 axis tight
                 saveas(h_spectr_plot3d,[out_folder,'/3Dplot',namefile,'.jpg']);
@@ -226,7 +227,8 @@ while (1)
             h_colorbar = colorbar('peer',h_spectr,'NorthOutside');
             set(h_colorbar,'Position',[0.1 0.8 0.4 0.01]);
             set(h_colorbar,'FontSize',12)
-            colormap(jet(1024));
+            pause(5);
+            colormap(h_spectr,jet(1024));
             colormark = 10*log10(P);
             maxcolor = max(max(colormark));
             mincolor = min(min(colormark));
