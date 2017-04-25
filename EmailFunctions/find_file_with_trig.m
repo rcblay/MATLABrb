@@ -1,4 +1,4 @@
-function filename = find_file_with_trig(trigtime,folder)
+function filename = find_file_with_trig(trigtime,folder,lenLog)
 % This function finds the filename that would theoretically have the
 % trigtime that is inputted. For example, if the file is a day long, and
 % the trig time happened at 02:00 UTC on Wednesday, this will find the
@@ -25,9 +25,8 @@ nf = numel(D); % Number of files/directories in folder is set to nf
 for i = (3:nf) % Skips to 3 because 1 and 2 are . and ..
     file=D(i).name;
     out = char(file); % Changes from cell to string
-    % Change start from 4 to 5 depending on log, i.e. not CU
-    stuff = out(4:end-28); %19 for unixtime stamp
-    logname = out(1:2); % assumes two letter logname
+    stuff = out((lenLog+2):end-28); %19 for unixtime stamp
+    logname = out(1:lenLog);
     fileAGC = char('AGC');
     % If CU_AGC file, (excludes AUTO or TRIGGER files or other files)
     if strcmp(stuff,fileAGC) == 1
@@ -35,7 +34,11 @@ for i = (3:nf) % Skips to 3 because 1 and 2 are . and ..
         datestring = out(8:end-8);
         filename2 = conv_to_unixtime(datestring);
         start_time = filename2; % Day collection began
-        end_time = start_time + (24*60*60); % Day collection ended
+        fid = fopen(char([folder, '/', file]));
+        data = fread(fid, 'uint32'); % read bin file 4 bytes at a time
+        fclose(fid);
+        time = data(2:2:end);
+        end_time = time(end); % Day collection ended
         if trig_timestamp >= start_time && trig_timestamp <= end_time
             plotdate = unixtime(filename2);
             strdate = datestr(plotdate);

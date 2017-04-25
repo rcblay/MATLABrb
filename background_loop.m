@@ -246,7 +246,7 @@ while (1)
             close(h_fig);
             fprintf('SAVED\n');
             if strcmp(unpck_filename,'temptrig.bin') && emailtrig == 1
-                dailyplot = find_file_with_trig(trigtime,folder);
+                dailyplot = find_file_with_trig(trigtime,folder,lenLog);
                 attachments = {[out_folder,'/',namefile,'.jpg'],...
                     dailyplot};
                 time = namefile(21:end);

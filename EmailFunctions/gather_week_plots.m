@@ -3,8 +3,6 @@ function attachments = gather_week_plots(out_folder,folder,start_time,...
 % This function gets all the files for the past week and returns them in
 % attachments.
 
-x_tick_location = 1; % Weekly plotting
-
 [fid, ~, ~] = AGC_Plotting(start_time, end_time,folder, ...
     ['/*' logname '_AGC*AGC.bin'],thresh,pts_under_thrsh);
 if (fid ~= -1) % If file exists, title it, set size, and save
