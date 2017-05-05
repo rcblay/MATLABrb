@@ -1,7 +1,15 @@
-function unpack_NT1065_4chn(filename_in,filename_out,L1L2G1G2)
+function unpack_NT1065_4chn(filename_in,filename_out)
+% Unpacks 4 channel NT file into 4 files
 
 fid = fopen(filename_in,'rb');
-fid_out = fopen(filename_out,'wb');
+filename_out1 = [filename_out(1:end-4) '1.bin'];
+filename_out2 = [filename_out(1:end-4) '2.bin'];
+filename_out3 = [filename_out(1:end-4) '3.bin'];
+filename_out4 = [filename_out(1:end-4) '4.bin'];
+fid_out1 = fopen(filename_out1,'wb');
+fid_out2 = fopen(filename_out2,'wb');
+fid_out3 = fopen(filename_out3,'wb');
+fid_out4 = fopen(filename_out4,'wb');
 
 piece = 4e6;
 fseek(fid,0,1);
@@ -22,19 +30,30 @@ for n = 0:nl-1
     
     data = fread(fid, npiece,'uint8'); % read the data from the opened file - fid
     
-    data_2file = zeros(numel(data),1);
-    if L1L2G1G2 == 1
-        data_2file(1:2:end) = LUT_I_long1(data(1:2:end)+1);
-        data_2file(2:2:end) = LUT_Q_long1(data(1:2:end)+1);
-    elseif L1L2G1G2 == 2
-        data_2file(1:2:end) = LUT_I_long2(data+1);
-        data_2file(2:2:end) = LUT_Q_long2(data+1);
-    end
-    fwrite(fid_out,data_2file,'schar');
+    data_2file1 = zeros(numel(data),1);
+    data_2file2 = zeros(numel(data),1);
+    data_2file3 = zeros(numel(data),1);
+    data_2file4 = zeros(numel(data),1);
+    data_2file1(1:2:end) = LUT_I_long1(data(1:2:end)+1);
+    data_2file1(2:2:end) = LUT_Q_long1(data(1:2:end)+1);
+    data_2file2(1:2:end) = LUT_I_long2(data(1:2:end)+1);
+    data_2file2(2:2:end) = LUT_Q_long2(data(1:2:end)+1);
+    data_2file3(1:2:end) = LUT_I_long1(data(2:2:end)+1);
+    data_2file3(2:2:end) = LUT_Q_long1(data(2:2:end)+1);
+    data_2file4(1:2:end) = LUT_I_long2(data(2:2:end)+1);
+    data_2file4(2:2:end) = LUT_Q_long2(data(2:2:end)+1);
+    
+    fwrite(fid_out1,data_2file1,'schar');
+    fwrite(fid_out2,data_2file2,'schar');
+    fwrite(fid_out3,data_2file3,'schar');
+    fwrite(fid_out4,data_2file4,'schar');
     
     waitbar((n+1)/(nl),h);
 end
 
 fclose(fid);
-fclose(fid_out);
+fclose(fid_out1);
+fclose(fid_out2);
+fclose(fid_out3);
+fclose(fid_out4);
 close(h);

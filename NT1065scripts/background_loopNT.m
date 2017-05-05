@@ -35,7 +35,7 @@ while (1)
             plotdate = unixtime(filename); % Changes to date vector
             strdate = datestr(plotdate,0);
             strdate(strdate == ' ') = '_';
-            strdate(strdate == ':') = '-';
+            strdate(strdate == ':') = '-'; % Required
             len = length(channels);
             for ii = 1:len
                 FN{ii} = [logname,'_DailyNT_Ch',num2str(channels(ii)),...
@@ -102,6 +102,155 @@ while (1)
     end
     
     %% Spectrum Plots, TODO
+    
+    for j = 3:nf
+        % Check if file is a triggered or nominal
+        extendedlogname = [logname, '_AGC'];
+        [a,b] = regexp(D(j).name,[extendedlogname,'(_nominal_|_ch1_triggered_',...
+            '|_ch2_triggered_|_ch3_triggered_|_ch4_triggered_)(.)*.bin$'],...
+            'start','tokens'); 
+        if(~isempty(a))
+            date = conv_to_unixtime(b{1}{2});
+            % Obtains file name
+            c = regexp(D(j).name,'(.)*.bin$','tokens');
+            % Print filename on terminal
+            fprintf(['[',logname,']',c{1}{1},'...']);
+            plotdate = unixtime(date);
+            strdate = datestr(plotdate,0);
+            strdate2 = strdate;
+            strdate(strdate == ' ') = '_';
+            strdate(strdate == ':') = '-';
+            if strcmp(b{1}{1},'_nominal_') % Checks for nominal, else trigger
+                % Names file for automatically saved data (23 hours)
+                namefile = [logname,'_SpectroNominal_',strdate];
+                unpck_filename = 'tempnom.bin';
+            else
+                % Names file for triggered auto save (below threshold)
+                chan = b{1}{1}(4);
+                namefile = [logname,'_SpectroTrigger',num2str(chan),'_',strdate];
+                unpck_filename = ['temptrig_ch' num2str(chan) '_output.bin'];
+                trigtime = strdate;
+            end
+            % FIX TODO
+            % Check if exists already, and if so skips to next file
+            if(exist([out_folder,'/',namefile,'.jpg'],'file'))
+                fprintf('EXISTS\n');
+                continue;
+            end
+            % Check for corresponding IF file
+            is_IF = 0;
+            for k = 3:nf % Another for loop of same files
+                % Search for match
+                if k ~= j
+                    date1 = char(c{1});
+                    date1 = date1(end-18:end);
+                    date2 = D(k).name(end-22:end-4);
+                    if strcmp(date1,date2)
+                        is_IF = 1;
+                        break;
+                    end
+                end
+            end
+            %unpack_NT1065_4chn([folder '/' D(k).name],unpck_filename);
+            % NEED AGC for all four channels parsed !!:
+            Data4ch = parseAGC4channel([folder '/' D(j).name],date);
+            % Loop through 4 channels and do tracking, spectro, and
+            % plotting
+            % Ch1-L1, Ch2-GloL1, Ch3-GloL2, Ch4-L2
+            for chann = 1:4
+                figNum = 300 + chann;
+                % Spectro part
+                % Activate_IF_generation set inside init.m
+                if((is_IF==1) && (activate_IF_generation==1))
+                    % Need init settings for sampling freq, msToProcess,
+                    % fileName
+                    if chann == 1 % GPS L1
+                        stt = Data4ch.Time4ch_Ch1;
+                        sagc = Data4ch.AGC4ch_Ch1;
+                        initSettingsL1; % Necessary
+                        sampling_freq = settings.samplingFreq;
+                        settings.msToProcess = floor((stt(end)-(stt(1)+0.1))*1000);
+                        unpackfilename = [unpck_filename(1:end) '.c0']; %change back
+                        settings.fileName = unpackfilename;
+                        init_trackingL1;
+                        unpacked_coeff = 2;
+                        centerfreq = 1575.42e6;
+                        interfreq = 14.58e6;
+                        namefile_ch = [namefile '_ch1'];
+                        channelNr = 1;
+                        plotSpectrumPlotNT(figNum,stt,sagc,trackResults,channelNr,...
+                            unpackfilename,sampling_freq,unpacked_coeff,...
+                            centerfreq,interfreq,offset,out_folder,namefile_ch,logname)
+                    end
+                    if chann == 2 % Glonass L1
+                        stt = Data4ch.Time4ch_Ch2;
+                        sagc = Data4ch.AGC4ch_Ch2;
+                        initSettingsGL; % Necessary
+                        sampling_freq = settings.samplingFreq;
+                        settings.msToProcess = floor((stt(end)-(stt(1)+0.1))*1000);
+                        unpackfilename = [unpck_filename(1:end-4) '2.bin'];
+                        settings.fileName = unpackfilename;
+                        settings.L1L2 = 1; % 1 for L1, 0 for L2
+                        settings.inputCenter     = 1602e6; 
+                        init_trackingGL;
+                        unpacked_coeff = 4;
+                        centerfreq = 1602e6;
+                        interfreq = 60e3;
+                        namefile_ch = [namefile '_ch2'];
+                        plotSpectrumPlotNT(figNum,stt,sagc,trackResults,channelNr,...
+                            unpackfilename,sampling_freq,unpacked_coeff,...
+                            centerfreq,interfreq,offset,out_folder,namefile_ch,logname)
+                    end
+                    if chann == 3 % Glonass L2
+                        stt = Data4ch.Time4ch_Ch3;
+                        sagc = Data4ch.AGC4ch_Ch3;
+                        initSettingsGL; % Necessary
+                        sampling_freq = settings.samplingFreq; % 6.625e6
+                        settings.msToProcess = floor((stt(end)-(stt(1)+0.1))*1000);
+                        unpackfilename = [unpck_filename(1:end-4) '3.bin'];
+                        settings.fileName = unpackfilename;
+                        settings.L1L2 = 0; % 1 for L1, 0 for L2
+                        settings.inputCenter     = 1246e6; 
+                        init_trackingGL;
+                        unpacked_coeff = 4;
+                        centerfreq = 1246e6;
+                        interfreq = 60e3;
+                        namefile_ch = [namefile '_ch3'];
+                        plotSpectrumPlotNT(figNum,stt,sagc,trackResults,channelNr,...
+                            unpackfilename,sampling_freq,unpacked_coeff,...
+                            centerfreq,interfreq,offset,out_folder,namefile_ch,logname)
+                    end
+                    if chann == 4 % GPS L2
+                        stt = Data4ch.Time4ch_Ch4;
+                        sagc = Data4ch.AGC4ch_Ch4;
+                        initSettingsL2; % Necessary
+                        sampling_freq = settings.samplingFreq;
+                        settings.msToProcess = floor((stt(end)-(stt(1)+0.1))*1000);
+                        unpackfilename = [unpck_filename(1:end-4) '4.bin'];
+                        settings.fileName = unpackfilename;
+                        init_trackingL2;
+                        unpacked_coeff = 4;
+                        centerfreq = 1227.6e6;
+                        interfreq = 60e3;
+                        namefile_ch = [namefile '_ch4'];
+                        plotSpectrumPlotNT(figNum,stt,sagc,trackResults,channelNr,...
+                            unpackfilename,sampling_freq,unpacked_coeff,...
+                            centerfreq,interfreq,offset,out_folder,namefile_ch,logname)
+                    end
+                end
+                  
+            end
+            % Need to alter find_file with trig for four channels
+%             if strcmp(unpck_filename(1:8),'temptrig') && emailtrig == 1
+%                 dailyplot = find_file_with_trig(trigtime,folder,lenLog);
+%                 attachments = {[out_folder,'/',namefile,'.jpg'],...
+%                     dailyplot};
+%                 time = namefile(21:end);
+%                 send_trig_email(time,logname,attachments,recipients);
+%             end
+        end
+        
+    end
 
     %% Find Time to UTC and send Emails
     cl = clock;
@@ -115,9 +264,9 @@ while (1)
     disp(['Work done! Next loop in ',num2str(pausetime),' sec. at 00:00 UTC']);
     close all;
     % Sunday, won't work 100 % if it is started on Sunday
-    if weekday(datestr(clock,'mm/dd/yy')) - Ahead_Behind == 1 && weekendemail == 1
-        weekend_email(logname,recipients,out_folder,folder,thresh,pts_under_thrsh);
-    end
+%     if weekday(datestr(clock,'mm/dd/yy')) - Ahead_Behind == 1 && weekendemail == 1
+%         weekend_email(logname,recipients,out_folder,folder,thresh,pts_under_thrsh);
+%     end
     
     % Check if files are still growing
     if is_data_logging == 1

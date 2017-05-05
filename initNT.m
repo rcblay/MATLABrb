@@ -11,9 +11,9 @@ addpaths;
 
 %% Sets parameters
 % Make sure to change initSettings if needed
-folder = '/home/dma/Documents/amungo_dumper_linux64_2016_11_01_1720';
+folder = '/home/dma/Documents/MATLAB/data/NT1065';
 out_folder = [folder,'/figures'];
-activate_IF_generation = 0; % Flag used to plot spectrum plots
+activate_IF_generation = 1; % Flag used to plot spectrum plots
 grow_check = 0; % Check if file is still growing
 is_data_logging = 0; % Should data still be logging?
 calib_file = 'calibration.mat'; % DIFFERENT FOR NT1065 but how?

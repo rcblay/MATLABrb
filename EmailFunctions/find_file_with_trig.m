@@ -21,7 +21,7 @@ trig_timestamp = conv_to_unixtime(trigtime4);
 
 D = dir(folder); % D is struct of contents of folder, i.e. SiGe data
 nf = numel(D); % Number of files/directories in folder is set to nf
-% Loops through files, and checks whether any need to be plotted
+% Loops through files
 for i = (3:nf) % Skips to 3 because 1 and 2 are . and ..
     file=D(i).name;
     out = char(file); % Changes from cell to string
@@ -31,7 +31,7 @@ for i = (3:nf) % Skips to 3 because 1 and 2 are . and ..
     % If CU_AGC file, (excludes AUTO or TRIGGER files or other files)
     if strcmp(stuff,fileAGC) == 1
         % Filename set to %Y-%m-%dT%H-%M-%S then converted to unixtime
-        datestring = out(8:end-8);
+        datestring = out((lenLog+6):end-8);
         filename2 = conv_to_unixtime(datestring);
         start_time = filename2; % Day collection began
         fid = fopen(char([folder, '/', file]));

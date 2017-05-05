@@ -3,16 +3,16 @@ calib_file = 'calibration.mat';
 load(calib_file); % Loads in steps_agc, & steps_atten from calibration.mat
 addpaths;
 % Filenames
-datafileAGC = '/home/dma/Sean_SiGe_Stuff/data/TEST_AGC_2017-04-24T18:54:32.AGC.bin';
-datafileIF = '/home/dma/Sean_SiGe_Stuff/data/TEST_IF_2017-04-24T18:54:32.IF.bin';
+datafileAGC = '/home/dma/sige_code/data/TEST_AGC_2017-05-04T21-13-22.AGC.bin';
+datafileIF = '/home/dma/sige_code/data/TEST_IF_2017-05-04T21-13-22.IF.bin';
 % Open files and move to end of file for reading
 fidA = fopen(datafileAGC);
 fidIF = fopen(datafileIF);
 fseek(fidA,0,1);
 fseek(fidIF,0,1);
 
-n = 12; % How often to update in seconds, SHOULD BE AT LEAST 10-12 sec (for now)
-m = 300; % How much previous data to visualize in seconds
+n = 3; % How often to update in seconds, SHOULD BE AT LEAST 10-12 sec (for now)
+m = 30; % How much previous data to visualize in seconds
 % Pauses for n seconds, starts with new data created once function starts,
 % meaning no previous data is shown
 pause(n);
