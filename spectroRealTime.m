@@ -1,4 +1,4 @@
-function [F,T,P] = spectro2(fid,agc,val,atten)
+function [F,T,P] = spectroRealTime(fid,agc,val,atten)
 
 % Sets bin size for time and finds file size
 unpacked_coeff = 4;

@@ -11,14 +11,14 @@ addpaths;
 
 %% Sets parameters
 % Make sure to change initSettings if needed
-folder = '/home/dma/Documents/AGC_vs_Pos/RawData';
+folder = '/home/dma/Documents/MATLAB/TDOArb/dataSiGe';
 out_folder = [folder,'/figures'];
-activate_IF_generation = 1; % Flag used to plot spectrum plots
-grow_check = 1; % Check if file is still growing
+activate_IF_generation = 0; % Flag used to plot spectrum plots
+grow_check = 0; % Check if file is still growing
 is_data_logging = 0; % Should data still be logging?
 calib_file = 'calibration.mat';
-logname = 'CU'; %'rec'
-localUTC = 17;
+logname = 'ARMY4'; %'rec'
+localUTC = 18;
 Ahead_Behind = 0; % Ahead of UTC = 1 (Korea), Behind UTC = 0 (Boulder)
 
 %% Automated Email Settings

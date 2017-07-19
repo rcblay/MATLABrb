@@ -1,0 +1,9 @@
+To run logging code:
+
+Real Time Visualization:
+
+sudo ./Jammer_detect -threshold 0.7 -logname ./data/TEST -unpacked -continuous
+
+24/7:
+
+sudo ./Jammer_detect -threshold 0.7 -logname ./data/TEST -unpacked -continuous

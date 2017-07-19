@@ -28,6 +28,9 @@ while (1)
         fileAGC = char('AGC');
         % If CU_AGC file, (excludes AUTO or TRIGGER files or other files)
         if strcmp(stuff,fileAGC) == 1 
+            if strcmp(out(1:lenLog),logname) == 0
+                continue;
+            end
             % Filename set to %Y-%m-%dT%H-%M-%S then converted to unixtime
             datestring = out((12+lenLog):end-4);
             filename = conv_to_unixtime(datestring);

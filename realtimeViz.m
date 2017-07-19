@@ -2,17 +2,52 @@
 calib_file = 'calibration.mat';
 load(calib_file); % Loads in steps_agc, & steps_atten from calibration.mat
 addpaths;
+
+folder = '/home/dma/sige_code';
+lenLog = 4;
+D = dir(folder);
+nf = numel(D);
+for i = 3:nf
+    a(i) = D(i).datenum;
+end
+
+[val,ind] = max(a);
+
+name = D(ind).name;
+
+AGCorIF = name(end-4);
+
+if strcmp(AGCorIF,'C')
+    othername = [name(1:lenLog+29) 'IF.bin'];
+    datafileAGC = [folder '/' name];
+    datafileIF = [folder '/' othername];
+elseif strcmp(AGCorIF,'F')
+    othername = [name(1:lenLog+29) 'AGC.bin'];
+    datafileAGC = [folder '/' othername];
+    datafileIF = [folder '/' name];
+end
+
+isCont = name(lenLog+2:lenLog+5);
+if ~strcmp(isCont,'CONT')
+    error('Please have continuous IF data.')
+end
+
+isUnpacked = name(lenLog+7);
+if ~strcmp(isUnpacked,'U')
+    error('Please have unpacked IF data.')
+end
+
 % Filenames
-datafileAGC = '/home/dma/sige_code/data/TEST_AGC_2017-05-04T21-13-22.AGC.bin';
-datafileIF = '/home/dma/sige_code/data/TEST_IF_2017-05-04T21-13-22.IF.bin';
+% datafileAGC = '/home/gnss/sige_code/data/TEST_AGC_2017-05-05T16-37-58.AGC.bin';
+% datafileIF = '/home/gnss/sige_code/data/TEST_IF_2017-05-05T16-37-58.IF.bin';
 % Open files and move to end of file for reading
 fidA = fopen(datafileAGC);
 fidIF = fopen(datafileIF);
 fseek(fidA,0,1);
 fseek(fidIF,0,1);
 
-n = 3; % How often to update in seconds, SHOULD BE AT LEAST 10-12 sec (for now)
-m = 30; % How much previous data to visualize in seconds
+n = 3; % How often to update in seconds, SHOULD BE AT LEAST 3 sec (for now)
+m = 10; % How much previous data to visualize in seconds
 % Pauses for n seconds, starts with new data created once function starts,
 % meaning no previous data is shown
 pause(n);
@@ -43,7 +78,7 @@ while(1)
         subplot(2,1,1)
         hold on
         plot(stt,sagc,'g.')
-        plot(stt_1,sagc_1,'y.')
+        plot(stt_1,sagc_1,'g.')
         grid on
         title('Real Time AGC Visualization')
         start_time = stt_1(1);
@@ -57,8 +92,8 @@ while(1)
         subplot(2,1,1)
         hold on
         plot(stt,sagc,'g.')
-        plot(stt_1,sagc_1,'y.')
-        plot(stt_2,sagc_2,'r.')
+        plot(stt_1,sagc_1,'g.')
+        plot(stt_2,sagc_2,'g.')
         grid on
         title('Real Time AGC Visualization')
         start_time = stt_2(1);
@@ -72,8 +107,8 @@ while(1)
         subplot(2,1,1)
         hold on
         plot(stt,sagc,'g.')
-        plot(stt_1,sagc_1,'y.')
-        plot(stt_2,sagc_2,'r.')
+        plot(stt_1,sagc_1,'g.')
+        plot(stt_2,sagc_2,'g.')
         grid on
         title('Real Time AGC Visualization')
         start_time = stt(end) - m;
@@ -88,11 +123,16 @@ while(1)
     % Check if the x ticks are supposed to be every hour
     [tick_loc,tick_label] = scale_x_axis(start_time,end_time);
     xlim([start_time, end_time]);
-    ylim([0.1 1.35])
+    ylim([0 1.5])
+    
+    tick_label = -(end_time - tick_loc);
+    tick_label(tick_label == -0) = 0;
+    
+    
     set(gca, 'XTick', tick_loc); % Set x ticks to the tick locations
     set(gca, 'xTickLabel', tick_label); % Set x tick labels to tick_label
     ylabel('AGC Value [V]');
-    xlabel('UTC Time');
+    xlabel('Seconds Ago [s]');
     
     %% Spectrum Plot
     h_spectr = subplot(2,1,2);
@@ -113,3 +153,4 @@ while(1)
     end
     ii = ii + 1;
 end
+

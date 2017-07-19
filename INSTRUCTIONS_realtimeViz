@@ -1,0 +1,6 @@
+Change the filenames for the AGC and IF files
+
+Change n to update rate (above 3 seconds)
+Change m to previous amount of seconds you want to see
+
+Run

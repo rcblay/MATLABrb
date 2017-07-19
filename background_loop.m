@@ -18,12 +18,12 @@ while (1)
         file=D(i).name; 
         out = char(file); % Changes from cell to string
         % Change start from 4 to 5 depending on log, i.e. not CU
-        stuff = out((2+lenLog):end-28); %19 for unixtime stamp
+        stuff = out(end-6:end-4); %19 for unixtime stamp
         fileAGC = char('AGC');
         % If CU_AGC file, (excludes AUTO or TRIGGER files or other files)
         if strcmp(stuff,fileAGC) == 1 
             % Filename set to %Y-%m-%dT%H-%M-%S then converted to unixtime
-            datestring = out((6+lenLog):end-8);
+            datestring = out((10+lenLog):end-8);
             filename = conv_to_unixtime(datestring);
             start_time = filename; % Day collection began
             plotdate = unixtime(filename); % Changes to date vector
@@ -57,7 +57,7 @@ while (1)
             % If jpg does not already exists, then it enters AGC_plotting
             % to be plotted. x_tick_location = 0 for hourly x ticks
             [fid, ~, ~] = AGC_Plotting(start_time, end_time,folder, ...
-                ['/*' logname '_AGC*AGC.bin'],thresh,pts_under_thrsh);
+                ['/*' logname '_\w\d_*AGC.bin'],thresh,pts_under_thrsh);
             if (fid ~= -1) % If file exists, title it, set size, and save
                 xlabel(['UTC Time',offset])
                 title(gca, [logname ' Daily AGC Data (from ', ...
@@ -81,14 +81,15 @@ while (1)
     % or every 23 hours.
     % Loops through every file and check if any need Spectro Plots
     for j = 3:nf % 1 and 2 are . and ..
-        % Checks for any DETECT or AUTO plots, a is start index and b is
+        % Checks for any TRIG or AUTO plots, a is start index and b is
         % cell of matches
         initSettings; % Necessary
         sampling_freq = settings.samplingFreq;
         [a,b] = regexp(D(j).name,[logname,...
-            '(_DETECT_|_AUTO_)(.)*.AGC.bin$'],'start','tokens'); 
-        if(~isempty(a)) % Not empty, meaning it is a DETECT/AUTO file
-            date = conv_to_unixtime(b{1}{2});
+            '(_TRIG_|_AUTO_)(.)*.AGC.bin$'],'start','tokens'); 
+        if(~isempty(a)) % Not empty, meaning it is a TRIG/AUTO file
+            modeWithDate = b{1}{2};
+            date = conv_to_unixtime(modeWithDate(4:end)); % removes mode
             trig_value = 0;
             % Checks for D(j).name match, c is CU_AGC_%Y-%m-%dT%H-%M-%S
             c = regexp(D(j).name,'(.)*.AGC.bin$','tokens'); 
@@ -111,7 +112,7 @@ while (1)
             strdate2 = strdate;
             strdate(strdate == ' ') = '_';
             strdate(strdate == ':') = '-';
-            if strcmp(b{1}{1},'_AUTO_') % Checks for AUTO, else DETECT
+            if strcmp(b{1}{1},'_AUTO_') % Checks for AUTO, else TRIG
                 % Names file for automatically saved data (23 hours)
                 namefile = [logname,'_SpectroNominal_',strdate];
                 unpck_filename = 'tempnom.bin';

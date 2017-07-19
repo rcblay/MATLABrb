@@ -11,13 +11,13 @@ addpaths;
 
 %% Sets parameters
 % Make sure to change initSettings if needed
-folder = '/home/dma/Documents/MATLAB/data/NT1065';
+folder = '/mnt/admin/Ft_Huachuca_EC17/NT1065/site1';
 out_folder = [folder,'/figures'];
-activate_IF_generation = 1; % Flag used to plot spectrum plots
+activate_IF_generation = 0; % Flag used to plot spectrum plots
 grow_check = 0; % Check if file is still growing
 is_data_logging = 0; % Should data still be logging?
 calib_file = 'calibration.mat'; % DIFFERENT FOR NT1065 but how?
-logname = 'CU'; %'rec'
+logname = 'site1'; %'rec'
 localUTC = 18;
 Ahead_Behind = 0; % Ahead of UTC = 1 (Korea), Behind UTC = 0 (Boulder)
 
@@ -28,7 +28,7 @@ weekendemail = 0;
 
 %% Channel/Trigger Settings
 channels = [1 2 3 4]; % Must match # of elements in thresh/pts_under_thrsh
-thresh = [42 24 20 24]; % Voltage threshold
+thresh = [30 10 10 30]; % Voltage threshold
 pts_under_thrsh = [5 5 5 5]; % # of pts under thresh to constitute trigger
 
 %% Set Initial Settings and Load in Calibration Data

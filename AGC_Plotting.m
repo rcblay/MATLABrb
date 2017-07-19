@@ -27,7 +27,7 @@ rawData = dir(strcat(directory,file_name));% Lists files that match format
 % Get the unix times from the file names
 fileNames = {rawData.name}; % Cell arrays with names
 % Match date
-fileDate_str = regexp(fileNames, ['_AGC_(.)*.AGC.bin$'], 'tokens'); 
+fileDate_str = regexp(fileNames, ['_\w\d_(.)*.AGC.bin$'], 'tokens'); 
 fileDate_str = [fileDate_str{:}]; % Concatenate all cells into one string
 if(isempty(fileNames)) % No files found, return
     disp(['No AGC files were found in the directory '...
