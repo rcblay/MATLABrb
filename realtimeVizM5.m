@@ -3,10 +3,8 @@ calib_file = 'calibration.mat';
 load(calib_file); % Loads in steps_agc, & steps_atten from calibration.mat
 addpaths;
 
-%% Settings
 folder = '/home/dma/sige_code';
-lenLog = 14;
-%% Find latest file
+lenLog = 3;
 D = dir(folder);
 nf = numel(D);
 for i = 3:nf
@@ -49,7 +47,7 @@ fseek(fidA,0,1);
 fseek(fidIF,0,1);
 
 n = 3; % How often to update in seconds, SHOULD BE AT LEAST 3 sec (for now)
-m = 60; % How much previous data to visualize in seconds
+m = 10; % How much previous data to visualize in seconds
 % Pauses for n seconds, starts with new data created once function starts,
 % meaning no previous data is shown
 pause(n);
@@ -62,9 +60,8 @@ while(1)
     stt = AGCdata(2:2:end); % time
     stt = interpTime(stt);
     sagc = AGCdata(1:2:end)*3.3/4096;
-    agcPrint = mean(sagc)
     % Gather spectrum data
-    [F,T,P] = spectroRealTime(fidIF,sagc,steps_agc,steps_atten);
+    [F,T,P] = spectroRealTimeM5(fidIF,sagc,steps_agc,steps_atten);
     
     %% Plot AGC
     if ii == 1
@@ -139,7 +136,7 @@ while(1)
     
     %% Spectrum Plot
     h_spectr = subplot(2,1,2);
-    h_spectr_plot = pcolor(h_spectr,(F+1575.42e6 - 38.4e3)*1e-6,T,10*log10(P));
+    h_spectr_plot = pcolor(h_spectr,(F+1575.42e6 - 4.092e6)*1e-6,T,10*log10(P));
     set(h_spectr_plot,'LineStyle','none'); % No line
     colormap(h_spectr,jet(1024));
     colormark = 10*log10(P);

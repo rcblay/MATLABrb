@@ -1,9 +1,9 @@
 %function NT1065_plot(filename,Channels,timerange,TimeStart,Day)
 
 %% Read in AGC Data
-filenameAGC = '/home/dma/Documents/regdump.bin';
+filenameAGC = '/home/dma/AmungoFx3Dumper-reg_reader/hw_images/AGC_daily_2017-08-17T19-59-07.bin';
 Channels = 1;
-timerange = [79.864 79.89177777];
+timerange = [0 .0001];
 TimeStart = 0;
 Day = 0;
 [time,agc] = parseFileAGC2(filenameAGC,Channels,timerange,TimeStart,Day);

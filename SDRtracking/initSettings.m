@@ -67,11 +67,11 @@ settings.dataType           = 'schar';
 % File Types
 %1 - 8 bit real samples S0,S1,S2,...
 %2 - 8 bit I/Q samples I0,Q0,I1,Q1,I2,Q2,...
-settings.fileType           = 2;
+settings.fileType           = 1;
 
 %Intermediate, sampling, code and L1 frequencies
-settings.IF                 = -38.4e3;      %[Hz]
-settings.samplingFreq       = 16.3676e6/4;     %[Hz]
+settings.IF                 = 4.092e6;      %[Hz]
+settings.samplingFreq       = 16.3676e6;     %[Hz]
 settings.codeFreqBasis      = 1.023e6;       %[Hz]
 settings.L1Freq             = 1575.42e6;   %[Hz]
 

@@ -6,7 +6,7 @@ function [plot_fid, plotted_time, plotted_agc] = AGC_Plotting(start_time...
 %   points_per_day:   number of points to be plotted in one day
 %   directory:        directory where the AGC data files are located
 %   file_name:        search name for AGC data files (ex.
-%                       ['/*' logname '_AGC*AGC.bin'])
+%                       ['/*' logname 'AGC.bin'])
 %   AGC_threshold:    threshold of AGC data that defines when the reciever
 %                       detects jammers or spoofers
 % output:
@@ -26,7 +26,8 @@ plotted_EventAGC = [];
 rawData = dir(strcat(directory,file_name));% Lists files that match format
 % Get the unix times from the file names
 fileNames = {rawData.name}; % Cell arrays with names
-% Match date
+% Match date, \w is a char, \d is a digit. Basically it is looking for
+% _U5_(strdate).AGC.bin and pulling out the strdate.
 fileDate_str = regexp(fileNames, ['_\w\d_(.)*.AGC.bin$'], 'tokens'); 
 fileDate_str = [fileDate_str{:}]; % Concatenate all cells into one string
 if(isempty(fileNames)) % No files found, return
@@ -45,6 +46,8 @@ end
 [fileDate, idx] = sort(fileDate); % Shows fileDate and index organized
 fileNames = fileNames(idx); % Reorganize files in same order as fileDate
 % All files after start_date and before end_time are true
+% ASSUMES FILES IN DIRECTORY DO NOT OVERLAP IN TIME // DO NOT CHANGE
+% A LOT OF FUNCTIONS REQUIRE THIS GREAT FUNCTIONALITY
 file_index =  (fileDate + 86399 >= start_time) & (fileDate < end_time); 
 fileNames = fileNames(file_index); % Only files after start and before end
 if(isempty(fileNames)) % Checks if empty
@@ -52,7 +55,7 @@ if(isempty(fileNames)) % Checks if empty
     plot_fid = -1;
     return;
 end
-fileDate = fileDate(file_index); % Now only dates in time range
+%fileDate = fileDate(file_index); % Now only dates in time range
 
 %% Plot files in Time Range
 % Open figure
@@ -71,9 +74,8 @@ for ii = 1:length(fileNames)
     % Find times that are in the time range
     time_index = find(time >= start_time & time <= end_time);
     time = time(time_index); % Sets time to only the time in time range
-
     if (~isempty(time)) % If not empty (expected), but could be empty
-        time = interpTime(time);
+        time = interpTime(time); % interpolate time so not all at same time
         % Creates array of trigger points that will be made red in future
         agc = agc(time_index); % Set agc to corresponding agc in time range
         k = 1;
@@ -88,7 +90,6 @@ for ii = 1:length(fileNames)
         % Plot
         plotted_time = [plotted_time; time];
         plotted_agc = [plotted_agc; agc];
-        
         % Check if there was no data plotted and return
         if isempty(plotted_time)
             disp('No data was found for the time range specified');
@@ -98,17 +99,11 @@ for ii = 1:length(fileNames)
         end
         % Plot
         hold on
-%         smootheda = smooth(plotted_agc,20);
-%         plot(gca, plotted_time, smootheda, 'go','MarkerSize',6,...
-%             'MarkerFaceColor','g');
         plot(gca, plotted_time, plotted_agc, 'go','MarkerSize',6,...
             'MarkerFaceColor','g');
         if exist('EventTime','var')
             plotted_EventTime = [plotted_EventTime; EventTime];
             plotted_EventAGC = [plotted_EventAGC; EventAGC];
-%             smoothed = smooth(plotted_EventAGC,20);
-%             plot(gca,plotted_EventTime,smoothed,'ro','MarkerSize',6,...
-%                 'MarkerFaceColor','r');
             plot(gca,plotted_EventTime,plotted_EventAGC,'ro','MarkerSize',6,...
                 'MarkerFaceColor','r');
         end

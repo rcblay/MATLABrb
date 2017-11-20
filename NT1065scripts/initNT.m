@@ -11,15 +11,15 @@ addpaths;
 
 %% Sets parameters
 % Make sure to change initSettings if needed
-folder = '/home/dma/Documents/CUvsSUcompare/data/NT1065';
+folder = '/mnt/admin/Brandon_Idaho/Night1/NT1065';
 out_folder = [folder,'/figures'];
-activate_IF_generation = 1; % Flag used to plot spectrum plots
-grow_check = 1; % Check if file is still growing
+activate_IF_generation = 0; % Flag used to plot spectrum plots
+grow_check = 0; % Check if file is still growing
 is_data_logging = 0; % Should data still be logging?
 calib_file = 'calibration.mat'; % DIFFERENT FOR NT1065 but how?
-logname = 'CU'; %'rec'
-localUTC = 18;
-Ahead_Behind = 0; % Ahead of UTC = 1 (Korea), Behind UTC = 0 (Boulder)
+logname = 'Idaho'; %'rec'
+localUTC = 2;
+Ahead_Behind = 1; % Ahead of UTC = 1 (Korea), Behind UTC = 0 (Boulder)
 
 %% Automated Email Settings
 recipients = {'rcblay@gmail.com','dma@colorado.edu'};

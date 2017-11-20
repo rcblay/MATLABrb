@@ -4,75 +4,91 @@
 % and any Trigger Spectrum Plots.
 
 while (1) 
+    % Ahead_Behind simply changes 'offset' which is used for labelling
+    % plots. Helps to know what side of UTC and conversion to local time.
     if Ahead_Behind == 0 % Behind
         offset = [', (Local: UTC-',num2str(24-localUTC),')'];
     else % Ahead
         offset = [', (Local: UTC+',num2str(localUTC),')'];
     end
     %% Plot the Daily AGC data
+    % Will look at all files in folder and check if they are new (not
+    % processed). Depending on flags, it may not analyze files still
+    % growing.
     D = dir(folder); % D is struct of contents of folder, i.e. SiGe data
     nf = numel(D); % Number of files/directories in folder is set to nf
     % Loops through files, and checks whether any need to be plotted
     lenLog = length(logname);
     for i = 3:nf % Skips to 3 because 1 and 2 are . and ..
-        file=D(i).name; 
-        out = char(file); % Changes from cell to string
-        % Change start from 4 to 5 depending on log, i.e. not CU
-        stuff = out(end-6:end-4); %19 for unixtime stamp
-        fileAGC = char('AGC');
-        % If CU_AGC file, (excludes AUTO or TRIGGER files or other files)
-        if strcmp(stuff,fileAGC) == 1 
+        file=D(i).name;
+        fileChar = char(file); % Changes the filename from cell to string
+        if length(fileChar) < 35
+            continue;
+        end
+        % Looks for 'AGC' at end of file name specifically .AGC.bin
+        isAGC = fileChar(end-6:end-4); 
+        isTRIG_AUTO = fileChar(end-34:end-31);
+        fileAGC = char('AGC'); % Creates char of AGC to compare
+        fileTRIG = char('TRIG'); % Creates char of TRIG to compare
+        fileAUTO = char('AUTO'); % Creates char of AUTO to compare
+        % If AGC.bin file:
+        if strcmp(isAGC,fileAGC)
+            % Have to make sure not AGC file from TRIG/AUTO
+            if strcmp(isTRIG_AUTO,fileTRIG) || strcmp(isTRIG_AUTO,fileTRIG)
+                continue;
+            end
             % Filename set to %Y-%m-%dT%H-%M-%S then converted to unixtime
-            datestring = out((10+lenLog):end-8);
-            filename = conv_to_unixtime(datestring);
-            start_time = filename; % Day collection began
-            plotdate = unixtime(filename); % Changes to date vector
-            strdate = datestr(plotdate,0);
-            strdate(strdate == ' ') = '_';
-            strdate(strdate == ':') = '-';
-            FN = [logname,'_DailyAGC_',strdate];
+            datestring = fileChar(end-26:end-8);
+            % converts to ten-digit unixtime timestamp
+            unixFilename = conv_to_unixtime(datestring); 
+            unixStart_time = unixFilename; % Day collection began
+            plotdate = unixtime(unixFilename); % Changes to date vector
+            strdate = datestr(plotdate,0); % 'dd-mmm-yyyy HH:MM:SS'
+            strdate(strdate == ' ') = '_'; % replaces space with _
+            strdate(strdate == ':') = '-'; % replaces : with - (needed)
+            FN = [logname,'_AGC_',strdate];
             % Checks to see if figure already exists, if so, then not 
             % plotted, prints to terminal that figure has already been 
             % plotted
             if(exist([out_folder,'/',FN,'.fig'],'file')) 
-                fprintf(['[',logname,']',out, '...']);
+                fprintf(['[',logname,']',fileChar, '...']);
                 fprintf(' EXISTS\n');
-                continue;
+                continue; % go to next file
             end
-            % Check if file is still growing
+            % Check if file is still growing, and skip if it is and flag
+            % set
             if grow_check == 1
-                isGrow = checkFileGrow([folder '/' out]);
+                isGrow = checkFileGrow([folder '/' fileChar]);
                 % If still growing, skip file
                 if isGrow == 1
-                    continue;
+                    continue; % go to next file
                 end
             end
-            
             % Find end_time by looking at last time entry in file
             fid = fopen(char([folder, '/', file]));
             data = fread(fid, 'uint32'); % read bin file 4 bytes at a time
-            fclose(fid);
-            time = data(2:2:end);
-            end_time = time(end); % Day collection ended
+            fclose(fid); % close file
+            time = data(2:2:end); % read in data for time (in unixtime)
+            unixEnd_time = time(end); % collection ended
             % If jpg does not already exists, then it enters AGC_plotting
-            % to be plotted. x_tick_location = 0 for hourly x ticks
-            [fid, ~, ~] = AGC_Plotting(start_time, end_time,folder, ...
+            % to be plotted.
+            [fid, ~, ~] = AGC_Plotting(unixStart_time,unixEnd_time,folder, ...
                 ['/*' logname '_\w\d_*AGC.bin'],thresh,pts_under_thrsh);
             if (fid ~= -1) % If file exists, title it, set size, and save
                 xlabel(['UTC Time',offset])
-                title(gca, [logname ' Daily AGC Data (from ', ...
-                    datestr(unixtime(start_time),0), ' to ', ...
-                    datestr(unixtime(end_time),0), ' [UTC])']);grid;
+                title(gca, [logname ' AGC Data (from ', ...
+                    datestr(unixtime(unixStart_time),0), ' to ', ...
+                    datestr(unixtime(unixEnd_time),0), ' [UTC])']);grid;
                 set(fid,'units','normalized','outerposition',[0 0 1 1])
                 set(gca,'FontSize',16)
-                saveas(fid, [out_folder '/' logname '_DailyAGC_', ...
+                saveas(fid, [out_folder '/' logname '_AGC_', ...
                     strdate, '.fig']); 
-                saveas(fid, [out_folder '/' logname '_DailyAGC_', ...
+                saveas(fid, [out_folder '/' logname '_AGC_', ...
                     strdate, '.jpg']);
                 close(fid);
             end
         else
-            continue; % If not CU_AGC file, then go to next file
+            continue; % If not AGC.bin file, then go to next file
         end
     end
     
@@ -85,33 +101,36 @@ while (1)
         % cell of matches
         initSettings; % Necessary
         sampling_freq = settings.samplingFreq;
+        % name: logname_TRIG/AUTO_mode_strdate.AGC.bin
+        % regexp gets the mode_strdate
         [a,b] = regexp(D(j).name,[logname,...
             '(_TRIG_|_AUTO_)(.)*.AGC.bin$'],'start','tokens'); 
         if(~isempty(a)) % Not empty, meaning it is a TRIG/AUTO file
             modeWithDate = b{1}{2};
-            date = conv_to_unixtime(modeWithDate(4:end)); % removes mode
-            trig_value = 0;
-            % Checks for D(j).name match, c is CU_AGC_%Y-%m-%dT%H-%M-%S
+            % removes mode and changes to ten digit unixtime
+            unixDate = conv_to_unixtime(modeWithDate(4:end)); 
+            % Checks for D(j).name match
+            % c is logname_TRIG/AUTO_mode_%Y-%m-%dT%H-%M-%S
             c = regexp(D(j).name,'(.)*.AGC.bin$','tokens'); 
             % Get AGC and Time values of this file
             % binary conversion when opening, b refers to big endian
             fid = fopen([folder,'/',D(j).name],'rb');
+            % read data from AGC file
             data = fread(fid,'uint32'); % read bin data in 4 byte chunks
             fclose(fid); % Close file
             % De-entrelace data
             stt = data(2:2:end); % time
-            stt = interpTime(stt);
+            stt = interpTime(stt); % interpolate time
             % ADC has 3.3V range & 12 bits give 4096 (2^12) discrete steps
             sagc = data(1:2:end)*3.3/4096; 
             % Print filename on terminal
             fprintf(['[',logname,']',c{1}{1},'...']);
             % Save the captured info for the sum up on
             % continuous AGC saving plot
-            plotdate = unixtime(date);
-            strdate = datestr(plotdate,0);
-            strdate2 = strdate;
-            strdate(strdate == ' ') = '_';
-            strdate(strdate == ':') = '-';
+            plotdate = unixtime(unixDate); % changes unix time stamp to vec
+            strdate = datestr(plotdate,0); % formats date
+            strdate(strdate == ' ') = '_'; % replaces space with _
+            strdate(strdate == ':') = '-'; % replaces : with -
             if strcmp(b{1}{1},'_AUTO_') % Checks for AUTO, else TRIG
                 % Names file for automatically saved data (23 hours)
                 namefile = [logname,'_SpectroNominal_',strdate];
@@ -133,7 +152,7 @@ while (1)
                 % Search for match
                 d = regexp(D(k).name,[c{1}{1},'.IF.bin$'],'start');
                 if(~isempty(d))
-                    is_IF = 1;
+                    is_IF = 1; % if IF file found break
                     break;
                 end
             end
@@ -149,12 +168,11 @@ while (1)
             % AGC axes sets location inside a 1x1 square
             h_agc_CNo = axes('Position', [0.55 0.1 0.30 0.70]);
             % Spectro part
-            % Activate_IF_generation set inside init.m
+            % Activate_IF_generation flag set inside init.m
             if((is_IF==1) && (activate_IF_generation==1))
                 % Tracking results
                 % Settings set in initSettings.m, skips 2 seconds
                 settings.msToProcess = floor((stt(end)-(stt(1)+0.1))*1000);
-                start_time = stt(1);
                 unpack_cplx([folder,'/',c{1}{1},'.IF.bin'], ...
                     unpck_filename); % Unpack & change name to temp.bin
                 settings.fileName = unpck_filename;
@@ -197,7 +215,7 @@ while (1)
                 [F,T,P] = spectro(unpck_filename,1024,sagc,steps_atten,...
                     steps_agc,sampling_freq,unpacked_coeff);
                 figure(3);
-                h_spectr_plot3d = mesh((F+1575.42e6 - 38.4e3)*1e-6,T,10*log10(P));
+                h_spectr_plot3d = mesh((F+1575.42e6 + settings.IF)*1e-6,T,10*log10(P));
                 xlabel('Frequency [MHz]','FontSize',16)
                 ylabel('Time [s]','FontSize',16)
                 zlabel('Power [dB]','FontSize',16)
@@ -209,8 +227,9 @@ while (1)
                 colormap(jet(1024));
                 axis tight
                 saveas(h_spectr_plot3d,[out_folder,'/3Dplot',namefile,'.jpg']);
-                h_spectr_plot = pcolor(h_spectr,(F+1575.42e6 - 38.4e3)*1e-6,T,10*log10(P));
+                h_spectr_plot = pcolor(h_spectr,(F+1575.42e6 + settings.IF)*1e-6,T,10*log10(P));
                 set(h_spectr_plot,'LineStyle','none'); % No line
+                colormark = 10*log10(P);
             end
             % Do a bunch of fancy settings to make plot look nice
             ylabel(h_spectr,'Time [s]','FontSize',16); % Time
@@ -230,7 +249,6 @@ while (1)
             set(h_colorbar,'FontSize',12)
             pause(5);
             colormap(h_spectr,jet(1024));
-            colormark = 10*log10(P);
             maxcolor = max(max(colormark));
             mincolor = min(min(colormark));
             set(h_spectr,'CLim',[mincolor maxcolor]); % Color spectrum

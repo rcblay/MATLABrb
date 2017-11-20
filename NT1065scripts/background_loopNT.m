@@ -99,6 +99,7 @@ while (1)
                     close(plot_ID);
                 end
             end
+            clear Data
         else
             continue; % If not AGC file, then go to next file
         end

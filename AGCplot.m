@@ -10,12 +10,14 @@ addpaths;
 
 %% Sets parameters
 % Make sure to change initSettings if needed
-folder = '/home/dma/sige_code';
-file = 'Test_CONT_U5_2017-07-13T16-12-10.AGC.bin';
+folder = '/home/dma/Documents';
+file = 'Korea_CONT_U5_2017-11-12T03-19-42.AGC.bin';
 out_folder = [folder,'/figures'];
-logname = 'Test'; %'rec'
-localUTC = 17;
-Ahead_Behind = 0; % Ahead of UTC = 1 (Korea), Behind UTC = 0 (Boulder)
+logname = 'Korea'; %'rec'
+titlename = 'Korea';
+fontsize = 18;
+localUTC = 9;
+Ahead_Behind = 1; % Ahead of UTC = 1 (Korea), Behind UTC = 0 (Boulder)
 
 %% Trigger Settings
 thresh = 0.001; % Voltage threshold
@@ -86,13 +88,20 @@ set(gca, 'XTick', tick_loc); % Set x ticks to the tick locations
 set(gca, 'xTickLabel', tick_label); % Set x tick labels to tick_label
 ylabel('AGC Value [V]');
 
+if exist('titlename','var')
+    title(gca, [titlename ' AGC Data (from ', ...
+        datestr(unixtime(start_time),0), ' to ', ...
+        datestr(unixtime(end_time),0), ' [UTC])']);grid;
+else
+    title(gca, [logname ' AGC Data (from ', ...
+        datestr(unixtime(start_time),0), ' to ', ...
+        datestr(unixtime(end_time),0), ' [UTC])']);grid;
+end
+
 xlabel(['UTC Time',offset])
-title(gca, [logname ' Daily AGC Data (from ', ...
-    datestr(unixtime(start_time),0), ' to ', ...
-    datestr(unixtime(end_time),0), ' [UTC])']);grid;
 %set(findall(gcf,'-property','FontSize'),'FontSize',16)
 set(plot_fid,'units','normalized','outerposition',[0 0 1 1])
-set(gca,'FontSize',24)
+set(gca,'FontSize',fontsize)
 saveas(plot_fid, [out_folder '/' logname '_DailyAGC_', ...
     strdate, '.fig']);
 saveas(plot_fid, [out_folder '/' logname '_DailyAGC_', ...

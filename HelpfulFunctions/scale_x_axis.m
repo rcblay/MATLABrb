@@ -59,7 +59,7 @@ elseif tot_time <= 12*60 % interval every min
         tick_label = [tick_label; datestr(unixtime(tick_loc(end)),...
             'HH:MM')];
     end
-elseif tot_time <= 24*60 % interval every 2 min
+elseif tot_time <= 20*60 % interval every 2 min
     offset = mod(start_time, 2*60); % Find hours after day start
     tick_loc = start_time-offset; % Find start of day by subtracting offset
      % Create tick_label for first hour
@@ -71,7 +71,7 @@ elseif tot_time <= 24*60 % interval every 2 min
         tick_label = [tick_label; datestr(unixtime(tick_loc(end)),...
             'HH:MM')];
     end
-elseif tot_time <= 60*60 % interval every 5 min
+elseif tot_time <= 50*60 % interval every 5 min
     offset = mod(start_time, 5*60); % Find hours after day start
     tick_loc = start_time-offset; % Find start of day by subtracting offset
      % Create tick_label for first hour
@@ -83,7 +83,7 @@ elseif tot_time <= 60*60 % interval every 5 min
         tick_label = [tick_label; datestr(unixtime(tick_loc(end)),...
             'HH:MM')];
     end
-elseif tot_time <= 3*60*60 % interval every 15 min
+elseif tot_time <= 2.5*60*60 % interval every 15 min
     offset = mod(start_time, 15*60); % Find hours after day start
     tick_loc = start_time-offset; % Find start of day by subtracting offset
      % Create tick_label for first hour
@@ -95,7 +95,7 @@ elseif tot_time <= 3*60*60 % interval every 15 min
         tick_label = [tick_label; datestr(unixtime(tick_loc(end)),...
             'HH:MM')];
     end
-elseif tot_time <= 6*60*60 % interval every 30 min
+elseif tot_time <= 5*60*60 % interval every 30 min
     offset = mod(start_time, 30*60); % Find hours after day start
     tick_loc = start_time-offset; % Find start of day by subtracting offset
      % Create tick_label for first hour
@@ -107,7 +107,7 @@ elseif tot_time <= 6*60*60 % interval every 30 min
         tick_label = [tick_label; datestr(unixtime(tick_loc(end)),...
             'HH:MM')];
     end
-elseif tot_time <= 12*60*60 % interval every hr
+elseif tot_time <= 10*60*60 % interval every hr
     offset = mod(start_time, 60*60); % Find hours after day start
     tick_loc = start_time-offset; % Find start of day by subtracting offset
      % Create tick_label for first hour

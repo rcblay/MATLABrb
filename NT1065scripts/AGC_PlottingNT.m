@@ -26,7 +26,7 @@ rawData = dir(strcat(directory,file_name));% Lists files that match format
 % Get the unix times from the file names
 fileNames = {rawData.name}; % Cell arrays with names
 % Match date
-fileDate_str = regexp(fileNames, '_AGC_daily_(.)*.bin$', 'tokens'); 
+fileDate_str = regexp(fileNames, 'AGC_daily_(.)*.bin$', 'tokens'); 
 fileDate_str = [fileDate_str{:}]; % Concatenate all cells into one string
 if(isempty(fileNames)) % No files found, return
     disp(['No AGC files were found in the directory '...
@@ -203,7 +203,7 @@ for i = 1:len
     plot(Data.(varNamePlottedTime),Data.(varNamePlottedTemp),'*g')
     set(gca,'FontSize',16) % not sure how it affects figure
     ylabel({'Temp' '[Celsius]'})
-    title(['Daily NT1065 Channel ', num2str(channels(i)), ' AGC Data (from ', ...
+    title(['NT1065 Channel ', num2str(channels(i)), ' AGC Data (from ', ...
         datestr(unixtime(start_time)), ' to ', ...
         datestr(unixtime(end_time)), ' [UTC])']);
     set(gca,'FontSize',15) % not sure how it affects figure
